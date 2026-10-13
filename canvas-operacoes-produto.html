@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canvas de Operações de Produto</title>
+  <meta name="description" content="Mapeie a saúde da operação de produto em 6 áreas, avalie cada uma e receba uma leitura de onde agir primeiro.">
+  <meta name="theme-color" content="#111118">
+  <style>
+    /* Paleta do portfólio (thaynabordin.github.io) */
+    :root{
+      --paper:#111118;--ink:#F0F0F0;--text-2:#A8A8C0;--muted:#6B6B85;--faint:#4A4A60;
+      --accent:#9B7FD4;--accent-soft:#D4C4F0;--surface:rgba(155,127,212,.04);
+      --border:rgba(155,127,212,.15);--border-strong:rgba(155,127,212,.3);
+      --mono:'Courier New',Courier,monospace;
+    }
+    *,*::before,*::after{box-sizing:border-box;}
+    html,body{margin:0;background:var(--paper);}
+    body{color:var(--ink);font-family:var(--mono);min-height:100vh;}
+    button{font-family:var(--mono);}
+    .app{min-height:100vh;position:relative;overflow:hidden;}
+    .grid-bg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+    .layer{position:relative;z-index:1;}
+
+    .home-link{display:inline-block;margin:16px 16px 0;padding:6px 12px;font-size:10px;font-weight:700;letter-spacing:.15em;color:var(--accent-soft);text-decoration:none;border:1px solid var(--border-strong);border-radius:3px;}
+    .home-link:hover{background:rgba(155,127,212,.12);}
+
+    header.head{border-bottom:1px solid var(--border);padding:28px 20px 32px;}
+    .wrap{max-width:640px;margin:0 auto;}
+    .corner{position:absolute;top:-10px;width:18px;height:18px;border-top:1.5px solid var(--border-strong);}
+    .corner.l{left:-10px;border-left:1.5px solid var(--border-strong);}
+    .corner.r{right:-10px;border-right:1.5px solid var(--border-strong);}
+    .lang{display:flex;justify-content:flex-end;margin-bottom:16px;}
+    .lang-box{display:flex;background:rgba(155,127,212,.06);border-radius:3px;overflow:hidden;border:1px solid var(--border);}
+    .lang-box button{padding:5px 14px;background:none;border:none;color:var(--muted);font-size:10px;font-weight:700;cursor:pointer;letter-spacing:.1em;}
+    .lang-box button+button{border-left:1px solid var(--border);}
+    .lang-box button.on{background:rgba(155,127,212,.15);color:var(--accent);}
+    h1{font-size:26px;font-weight:700;line-height:1.3;margin:0 0 10px;color:var(--ink);letter-spacing:.02em;}
+    .sub{font-size:13px;color:var(--text-2);line-height:1.6;max-width:420px;}
+
+    .tabs{max-width:640px;margin:0 auto;display:flex;border-bottom:1px solid var(--border);}
+    .tabs button{flex:1;padding:14px;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.2em;}
+    .tabs button.on{border-bottom-color:var(--accent);color:var(--accent);}
+
+    main{max-width:640px;margin:0 auto;padding:24px 16px 60px;}
+    .hint{font-size:11px;color:var(--muted);letter-spacing:.15em;margin-bottom:18px;text-align:center;}
+    .cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .card{background:var(--surface);border:1px dashed var(--border-strong);border-radius:3px;padding:18px 16px;cursor:pointer;text-align:left;position:relative;min-height:130px;display:flex;flex-direction:column;justify-content:space-between;transition:all .2s;color:inherit;}
+    .card:hover{border-color:var(--accent);}
+    .card-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+    .code{font-size:10px;font-weight:700;letter-spacing:.15em;color:var(--muted);background:rgba(155,127,212,.08);padding:3px 7px;border-radius:2px;}
+    .card-title{font-size:13px;font-weight:700;color:var(--ink);line-height:1.35;margin-bottom:8px;}
+    .card-prompt{font-size:11px;color:var(--text-2);line-height:1.5;}
+    .card-status{margin-top:12px;font-size:10px;letter-spacing:.1em;font-weight:700;display:flex;align-items:center;gap:6px;}
+    .card-corner{position:absolute;bottom:7px;right:7px;width:10px;height:10px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
+    .count{margin-top:18px;font-size:10px;color:var(--muted);text-align:center;letter-spacing:.15em;}
+    .btn-main{width:100%;margin-top:16px;padding:14px;background:none;border:2px solid var(--accent);border-radius:3px;color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.12em;}
+    .btn-main:hover{background:rgba(155,127,212,.1);}
+
+    .detail{animation:fadeIn .2s ease;}
+    .back{background:none;border:none;color:var(--accent);font-size:12px;cursor:pointer;padding:0 0 20px;letter-spacing:.08em;}
+    .detail-head{border-bottom:1px solid var(--border);padding-bottom:22px;margin-bottom:24px;}
+    .detail-code{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.15em;color:var(--accent);background:rgba(155,127,212,.12);padding:4px 10px;border-radius:2px;margin-bottom:10px;}
+    h2{font-size:20px;font-weight:700;color:var(--ink);margin:0 0 8px;}
+    .desc{font-size:13px;color:var(--text-2);margin:0;line-height:1.7;}
+    .block{margin-bottom:28px;}
+    .label{font-size:10px;letter-spacing:.2em;color:var(--muted);margin-bottom:14px;font-weight:700;}
+    .q{font-size:13px;color:var(--text-2);line-height:1.6;padding:10px 0;border-bottom:1px dashed var(--border);display:flex;gap:12px;}
+    .q-num{color:var(--faint);min-width:20px;font-size:10px;padding-top:3px;font-weight:700;}
+    .opts{display:flex;gap:10px;}
+    .opt{flex:1;padding:16px 10px;background:var(--surface);border:1px dashed var(--border-strong);border-radius:3px;cursor:pointer;text-align:center;transition:all .2s;}
+    .opt-sym{font-size:22px;color:var(--faint);margin-bottom:6px;}
+    .opt-lbl{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.08em;}
+    textarea{width:100%;min-height:90px;background:var(--surface);border:1px dashed var(--border-strong);border-radius:3px;padding:14px 16px;color:var(--ink);font-size:13px;line-height:1.6;font-family:var(--mono);resize:vertical;outline:none;}
+    textarea:focus{border-color:var(--accent);}
+    textarea::placeholder{color:var(--faint);}
+    .btn-save{width:100%;padding:14px;background:none;border:1px solid var(--border-strong);border-radius:3px;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.1em;}
+    .btn-save.ready{background:rgba(155,127,212,.1);border:2px solid var(--accent);color:var(--accent);}
+
+    .empty{text-align:center;padding:48px 20px;color:var(--muted);}
+    .empty .label{margin-bottom:18px;font-size:11px;}
+    .empty p{font-size:13px;line-height:1.7;margin:0 0 24px;color:var(--text-2);}
+    .btn-ghost{padding:12px 28px;background:none;border:1px dashed var(--border-strong);border-radius:3px;color:var(--accent);font-size:12px;cursor:pointer;letter-spacing:.12em;}
+    .summary{display:flex;margin-bottom:20px;border:1px solid var(--border);border-radius:3px;overflow:hidden;}
+    .summary > div{border-right:1px solid var(--border);padding:18px 12px;text-align:center;transition:flex .3s ease;}
+    .summary > div:last-child{border-right:none;}
+    .sum-n{font-size:30px;font-weight:800;line-height:1;margin-bottom:4px;}
+    .sum-l{font-size:10px;letter-spacing:.12em;font-weight:700;}
+    .bar{display:flex;height:8px;border-radius:2px;overflow:hidden;margin-bottom:28px;gap:3px;}
+    .bar > div{opacity:.8;border-radius:2px;}
+    .group{margin-bottom:22px;}
+    .group-head{font-size:10px;letter-spacing:.18em;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+    .group-head .line{flex:1;height:1px;}
+    .row{background:var(--surface);padding:14px 16px;margin-bottom:8px;border-radius:0 3px 3px 0;}
+    .row-top{display:flex;align-items:center;gap:10px;}
+    .row-code{font-size:10px;font-weight:700;letter-spacing:.1em;opacity:.8;}
+    .row-title{font-size:14px;font-weight:700;color:var(--ink);}
+    .row-note{font-size:12px;color:var(--text-2);line-height:1.6;font-style:italic;padding-left:40px;margin-top:8px;white-space:pre-wrap;}
+    .reading{background:var(--surface);border:1px dashed var(--border-strong);border-radius:3px;padding:20px 18px;margin:8px 0 24px;}
+    .reading .label{color:var(--accent);margin-bottom:12px;}
+    .reading div:last-child{font-size:14px;color:var(--text-2);line-height:1.8;}
+    .btn-reset{width:100%;padding:13px;background:none;border:1px dashed var(--border);border-radius:3px;color:var(--muted);font-size:11px;cursor:pointer;letter-spacing:.12em;}
+    footer{text-align:center;padding:18px;border-top:1px solid var(--border);font-size:10px;color:var(--faint);letter-spacing:.12em;}
+    footer a{color:var(--muted);text-decoration:none;}
+    footer a:hover{color:var(--accent);}
+
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <svg class="grid-bg" aria-hidden="true">
+    <defs>
+      <pattern id="smallGrid" width="24" height="24" patternUnits="userSpaceOnUse">
+        <path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(155,127,212,0.05)" stroke-width="0.5"/>
+      </pattern>
+      <pattern id="grid" width="120" height="120" patternUnits="userSpaceOnUse">
+        <rect width="120" height="120" fill="url(#smallGrid)"/>
+        <path d="M 120 0 L 0 0 0 120" fill="none" stroke="rgba(155,127,212,0.1)" stroke-width="0.5"/>
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#grid)"/>
+  </svg>
+  <div class="layer" id="root"></div>
+</div>
+
+<script>
+const AREAS = {
+  pt: [
+    { id: "processes", label: "Processos & Fluxos", code: "PRC",
+      prompt: "Como o trabalho flui do problema à entrega?",
+      description: "Etapas de descoberta, desenvolvimento e entrega. Inclui como demandas entram, são priorizadas e chegam ao usuário.",
+      questions: ["O caminho de uma ideia até a entrega está documentado?", "O time sabe qual é o processo sem precisar perguntar?", "Existem gargalos recorrentes que todo mundo conhece mas ninguém resolve?", "O processo é revisado periodicamente ou só quando quebra?"] },
+    { id: "tools", label: "Ferramentas & Sistemas", code: "FER",
+      prompt: "O ecossistema de ferramentas ajuda ou atrapalha?",
+      description: "Todas as ferramentas usadas pelo time de produto — gestão de backlog, documentação, comunicação, análise de dados, design.",
+      questions: ["As ferramentas conversam entre si ou criam ilhas de informação?", "O time usa as ferramentas de forma consistente?", "Existe uma fonte única de verdade pra cada tipo de informação?", "Novas pessoas conseguem se localizar rapidamente no ecossistema?"] },
+    { id: "metrics", label: "Métricas & Indicadores", code: "MET",
+      prompt: "Vocês medem o que importa ou o que é fácil?",
+      description: "Os indicadores que o time acompanha para tomar decisões — de produto, de experiência, de operação e de negócio.",
+      questions: ["Existe clareza sobre quais métricas importam pra cada decisão?", "As métricas são acessíveis pra todo o time ou ficam com poucas pessoas?", "Indicadores de experiência do usuário fazem parte do acompanhamento?", "Os dados influenciam decisões reais ou só decoram apresentações?"] },
+    { id: "governance", label: "Governança & Decisão", code: "GOV",
+      prompt: "Está claro quem decide o quê e como?",
+      description: "O modelo de tomada de decisão — quem prioriza, quem aprova, como conflitos são resolvidos, como trocas são feitas.",
+      questions: ["Está claro quem tem autoridade sobre cada tipo de decisão?", "Existem critérios explícitos de priorização ou depende de quem fala mais alto?", "Conflitos entre áreas têm um caminho claro de resolução?", "Decisões importantes são registradas com contexto e justificativa?"] },
+    { id: "people", label: "Pessoas & Capacitação", code: "PES",
+      prompt: "O time tem o que precisa pra crescer e entregar?",
+      description: "Estrutura do time, papéis, competências, integração de novos membros, desenvolvimento profissional e retenção.",
+      questions: ["Os papéis e responsabilidades são claros pra todos?", "A integração de novas pessoas é estruturada ou cada um se vira?", "Existe investimento em desenvolvimento de competências?", "O time tem autonomia suficiente ou depende demais de aprovações?"] },
+    { id: "alignment", label: "Comunicação & Alinhamento", code: "COM",
+      prompt: "A informação certa chega pra pessoa certa na hora certa?",
+      description: "Como o time se comunica internamente e com áreas parceiras — rituais, canais, documentação, visibilidade do trabalho.",
+      questions: ["Todos sabem no que os outros estão trabalhando?", "A comunicação entre produto, design e engenharia é fluida?", "Existem rituais efetivos ou reuniões que poderiam ser um documento?", "Áreas parceiras (negócio, suporte, vendas) têm visibilidade do que acontece em produto?"] },
+  ],
+  en: [
+    { id: "processes", label: "Processes & Workflows", code: "PRC",
+      prompt: "How does work flow from problem to delivery?",
+      description: "Discovery, development and delivery stages. Includes how demands come in, get prioritized and reach the user.",
+      questions: ["Is the path from idea to delivery documented?", "Does the team know the process without having to ask?", "Are there recurring bottlenecks everyone knows but no one fixes?", "Is the process reviewed periodically or only when it breaks?"] },
+    { id: "tools", label: "Tools & Systems", code: "TLS",
+      prompt: "Does the tooling ecosystem help or hinder?",
+      description: "All tools used by the product team — backlog management, documentation, communication, data analysis, design.",
+      questions: ["Do tools talk to each other or create information silos?", "Does the team use tools consistently?", "Is there a single source of truth for each type of information?", "Can new people find their way around the ecosystem quickly?"] },
+    { id: "metrics", label: "Metrics & Indicators", code: "MET",
+      prompt: "Do you measure what matters or what's easy?",
+      description: "The indicators the team tracks to make decisions — product, experience, operations and business metrics.",
+      questions: ["Is it clear which metrics matter for each decision?", "Are metrics accessible to the whole team or held by a few?", "Are user experience indicators part of the tracking?", "Do data points influence real decisions or just decorate presentations?"] },
+    { id: "governance", label: "Governance & Decision-Making", code: "GOV",
+      prompt: "Is it clear who decides what and how?",
+      description: "The decision-making model — who prioritizes, who approves, how conflicts are resolved, how trade-offs are made.",
+      questions: ["Is it clear who has authority over each type of decision?", "Are there explicit prioritization criteria or does it depend on who speaks loudest?", "Do cross-team conflicts have a clear resolution path?", "Are important decisions recorded with context and rationale?"] },
+    { id: "people", label: "People & Enablement", code: "PPL",
+      prompt: "Does the team have what it needs to grow and deliver?",
+      description: "Team structure, roles, competencies, onboarding, professional development and retention.",
+      questions: ["Are roles and responsibilities clear to everyone?", "Is onboarding structured or left to chance?", "Is there investment in competency development?", "Does the team have enough autonomy or is it over-dependent on approvals?"] },
+    { id: "alignment", label: "Communication & Alignment", code: "COM",
+      prompt: "Does the right info reach the right person at the right time?",
+      description: "How the team communicates internally and with partner areas — rituals, channels, documentation, work visibility.",
+      questions: ["Does everyone know what others are working on?", "Is communication between product, design and engineering fluid?", "Are there effective rituals or meetings that could be a document?", "Do partner areas (business, support, sales) have visibility into product?"] },
+  ],
+};
+
+// Cores de status: tons suaves que harmonizam com a paleta do portfólio
+const HEALTH_COLORS = { healthy: "#D4C4F0", attention: "#9B7FD4", critical: "#E07A9A" };
+const HEALTH_OPTIONS = {
+  pt: [
+    { value: "healthy", label: "Saudável", symbol: "●" },
+    { value: "attention", label: "Atenção", symbol: "◐" },
+    { value: "critical", label: "Crítico", symbol: "○" },
+  ],
+  en: [
+    { value: "healthy", label: "Healthy", symbol: "●" },
+    { value: "attention", label: "Needs Attention", symbol: "◐" },
+    { value: "critical", label: "Critical", symbol: "○" },
+  ],
+};
+
+const UI = {
+  pt: {
+    home: "← PORTAL DE CRIAÇÕES",
+    title1: "CANVAS DE OPERAÇÕES", title2: "DE PRODUTO",
+    subtitle1: "Mapeie a saúde da operação em 6 áreas.", subtitle2: "Avalie. Anote. Identifique onde agir.",
+    tabCanvas: "CANVAS", tabReading: "LEITURA",
+    instruction: "— TOQUE EM UMA ÁREA PARA AVALIAR —",
+    mapped: "ÁREAS MAPEADAS", seeReading: "VER LEITURA COMPLETA →", back: "← VOLTAR",
+    diagnosticQ: "PERGUNTAS DIAGNÓSTICAS", assessment: "AVALIAÇÃO", notes: "ANOTAÇÕES",
+    notesPlaceholder: "Gargalos, observações, ideias...",
+    saveBack: "SALVAR E VOLTAR", backNoSave: "VOLTAR SEM AVALIAR",
+    insufficient: "DADOS INSUFICIENTES", insufficientDesc: "áreas restantes no canvas para gerar a leitura completa.",
+    goCanvas: "IR AO CANVAS", reading: "LEITURA", reset: "LIMPAR E RECOMEÇAR",
+    footer: "CANVAS DE OPERAÇÕES DE PRODUTO — POR THAYNÁ BORDIN", evaluate: "Avalie as",
+    interp: [
+      "Mais da metade das áreas está em estado crítico. Antes de otimizar, estabilize. Comece por Governança e Processos — são a base que sustenta todo o resto.",
+      "Existem áreas críticas que travam o restante da operação. Foque nelas primeiro — melhorias aqui destravam avanço nas outras dimensões.",
+      "A operação funciona mas acumula pontos de atrito. O risco é normalizar o desconforto. Escolha a área de maior impacto no dia a dia e trate com intenção.",
+      "Operação em boa forma. O desafio agora é sustentar e evoluir. Revise este canvas a cada trimestre pra identificar regressões antes que virem crises.",
+    ],
+  },
+  en: {
+    home: "← CREATIONS PORTAL",
+    title1: "PRODUCT OPERATIONS", title2: "CANVAS",
+    subtitle1: "Map your operation's health across 6 areas.", subtitle2: "Assess. Annotate. Identify where to act.",
+    tabCanvas: "CANVAS", tabReading: "READING",
+    instruction: "— TAP AN AREA TO ASSESS —",
+    mapped: "AREAS MAPPED", seeReading: "SEE FULL READING →", back: "← BACK",
+    diagnosticQ: "DIAGNOSTIC QUESTIONS", assessment: "ASSESSMENT", notes: "NOTES",
+    notesPlaceholder: "Bottlenecks, observations, ideas...",
+    saveBack: "SAVE AND GO BACK", backNoSave: "GO BACK WITHOUT SAVING",
+    insufficient: "INSUFFICIENT DATA", insufficientDesc: "remaining areas on the canvas to generate the full reading.",
+    goCanvas: "GO TO CANVAS", reading: "READING", reset: "CLEAR AND RESTART",
+    footer: "PRODUCT OPERATIONS CANVAS — BY THAYNÁ BORDIN", evaluate: "Assess the",
+    interp: [
+      "More than half the areas are in critical condition. Before optimizing, stabilize. Start with Governance and Processes — they're the foundation that supports everything else.",
+      "There are critical areas blocking the rest of the operation. Focus on them first — improvements here unlock progress across other dimensions.",
+      "The operation works but friction points are accumulating. The risk is normalizing discomfort. Pick the area with the most daily impact and address it intentionally.",
+      "Operation in good shape. The challenge now is to sustain and evolve. Revisit this canvas every quarter to catch regressions before they become crises.",
+    ],
+  },
+};
+
+const state = { lang: "pt", activeArea: null, health: {}, notes: {}, view: "canvas" };
+const root = document.getElementById("root");
+
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const opts = () => HEALTH_OPTIONS[state.lang].map(o => ({ ...o, color: HEALTH_COLORS[o.value] }));
+
+function set(patch) { Object.assign(state, patch); render(); }
+
+function canvasView(t, areas) {
+  const assessed = Object.keys(state.health).length;
+  const cards = areas.map(a => {
+    const h = state.health[a.id];
+    const o = h && opts().find(x => x.value === h);
+    const cardStyle = o ? `background:${o.color}0D;border:1px solid ${o.color}66;` : "";
+    const codeStyle = o ? `color:${o.color};background:${o.color}22;` : "";
+    return `
+      <button class="card" data-area="${a.id}" style="${cardStyle}">
+        <div>
+          <div class="card-row">
+            <span class="code" style="${codeStyle}">${a.code}</span>
+            ${state.notes[a.id] ? '<span style="font-size:10px;color:var(--muted)">✎</span>' : ""}
+          </div>
+          <div class="card-title">${esc(a.label)}</div>
+          <div class="card-prompt">${esc(a.prompt)}</div>
+        </div>
+        ${o ? `<div class="card-status" style="color:${o.color}"><span style="font-size:12px">${o.symbol}</span>${o.label.toUpperCase()}</div>` : ""}
+        <div class="card-corner"></div>
+      </button>`;
+  }).join("");
+  return `
+    <div class="hint">${t.instruction}</div>
+    <div class="cards">${cards}</div>
+    ${assessed > 0 ? `<div class="count">${assessed}/${areas.length} ${t.mapped}</div>` : ""}
+    ${assessed === areas.length ? `<button class="btn-main" data-view="overview">${t.seeReading}</button>` : ""}`;
+}
+
+function detailView(t, area) {
+  const current = state.health[area.id];
+  const options = opts().map(o => {
+    const sel = current === o.value;
+    const st = sel ? `background:${o.color}1F;border:2px solid ${o.color};` : "";
+    return `
+      <button class="opt" data-health="${o.value}" style="${st}">
+        <div class="opt-sym" style="${sel ? `color:${o.color}` : ""}">${o.symbol}</div>
+        <div class="opt-lbl" style="${sel ? `color:${o.color}` : ""}">${o.label.toUpperCase()}</div>
+      </button>`;
+  }).join("");
+  return `
+    <div class="detail">
+      <button class="back" data-close>${t.back}</button>
+      <div class="detail-head">
+        <span class="detail-code">${area.code}</span>
+        <h2>${esc(area.label)}</h2>
+        <p class="desc">${esc(area.description)}</p>
+      </div>
+      <div class="block">
+        <div class="label">${t.diagnosticQ}</div>
+        ${area.questions.map((q, i) => `<div class="q"><span class="q-num">${String(i + 1).padStart(2, "0")}</span><span>${esc(q)}</span></div>`).join("")}
+      </div>
+      <div class="block">
+        <div class="label">${t.assessment}</div>
+        <div class="opts">${options}</div>
+      </div>
+      <div class="block">
+        <div class="label">${t.notes}</div>
+        <textarea id="notes" placeholder="${esc(t.notesPlaceholder)}">${esc(state.notes[area.id] || "")}</textarea>
+      </div>
+      <button class="btn-save ${current ? "ready" : ""}" data-close>${current ? t.saveBack : t.backNoSave}</button>
+    </div>`;
+}
+
+function overviewView(t, areas) {
+  const assessed = Object.keys(state.health).length;
+  if (assessed < areas.length) {
+    return `
+      <div class="empty">
+        <div class="label">${t.insufficient}</div>
+        <p>${t.evaluate} ${areas.length - assessed} ${t.insufficientDesc}</p>
+        <button class="btn-ghost" data-view="canvas">${t.goCanvas}</button>
+      </div>`;
+  }
+  const vals = Object.values(state.health);
+  const sum = { healthy: 0, attention: 0, critical: 0 };
+  vals.forEach(v => sum[v]++);
+  const interp = sum.critical >= 3 ? t.interp[0] : sum.critical >= 1 ? t.interp[1] : sum.attention >= 3 ? t.interp[2] : t.interp[3];
+  const o = opts();
+
+  const summary = o.map(x => `
+    <div style="flex:${sum[x.value] || 0.3};background:${x.color}14">
+      <div class="sum-n" style="color:${x.color}">${sum[x.value]}</div>
+      <div class="sum-l" style="color:${x.color}">${x.label.toUpperCase()}</div>
+    </div>`).join("");
+  const bar = o.filter(x => sum[x.value]).map(x => `<div style="flex:${sum[x.value]};background:${x.color}"></div>`).join("");
+  const groups = ["critical", "attention", "healthy"].map(hv => {
+    const list = areas.filter(a => state.health[a.id] === hv);
+    if (!list.length) return "";
+    const x = o.find(y => y.value === hv);
+    return `
+      <div class="group">
+        <div class="group-head" style="color:${x.color}"><span style="font-size:12px">${x.symbol}</span>${x.label.toUpperCase()}<span class="line" style="background:${x.color}40"></span></div>
+        ${list.map(a => `
+          <div class="row" style="border-left:3px solid ${x.color}">
+            <div class="row-top"><span class="row-code" style="color:${x.color}">${a.code}</span><span class="row-title">${esc(a.label)}</span></div>
+            ${state.notes[a.id] ? `<div class="row-note">${esc(state.notes[a.id])}</div>` : ""}
+          </div>`).join("")}
+      </div>`;
+  }).join("");
+
+  return `
+    <div class="summary">${summary}</div>
+    <div class="bar">${bar}</div>
+    ${groups}
+    <div class="reading"><div class="label">${t.reading}</div><div>${interp}</div></div>
+    <button class="btn-reset" data-reset>${t.reset}</button>`;
+}
+
+function render() {
+  const t = UI[state.lang];
+  const areas = AREAS[state.lang];
+  const assessed = Object.keys(state.health).length;
+  const area = state.activeArea && areas.find(a => a.id === state.activeArea);
+  document.documentElement.lang = state.lang === "pt" ? "pt-BR" : "en";
+
+  let body;
+  if (state.view === "overview") body = overviewView(t, areas);
+  else body = area ? detailView(t, area) : canvasView(t, areas);
+
+  root.innerHTML = `
+    <a class="home-link" href="./">${t.home}</a>
+    <header class="head">
+      <div class="wrap" style="position:relative">
+        <div class="corner l"></div><div class="corner r"></div>
+        <div class="lang"><div class="lang-box">
+          ${["pt", "en"].map(l => `<button data-lang="${l}" class="${state.lang === l ? "on" : ""}">${l.toUpperCase()}</button>`).join("")}
+        </div></div>
+        <h1>${t.title1}<br>${t.title2}</h1>
+        <div class="sub">${t.subtitle1}<br>${t.subtitle2}</div>
+      </div>
+    </header>
+    <nav class="tabs">
+      <button data-view="canvas" class="${state.view === "canvas" ? "on" : ""}">${t.tabCanvas}</button>
+      <button data-view="overview" class="${state.view === "overview" ? "on" : ""}">${t.tabReading}${assessed === areas.length ? "" : ` [${assessed}/6]`}</button>
+    </nav>
+    <main>${body}</main>
+    <footer><a href="./">${t.footer}</a></footer>`;
+}
+
+root.addEventListener("click", e => {
+  const el = e.target.closest("button");
+  if (!el) return;
+  if (el.dataset.lang) set({ lang: el.dataset.lang });
+  else if (el.dataset.view) set({ view: el.dataset.view, activeArea: null });
+  else if (el.dataset.area) { set({ activeArea: el.dataset.area }); scrollTo(0, 0); }
+  else if (el.dataset.health) set({ health: { ...state.health, [state.activeArea]: el.dataset.health } });
+  else if ("close" in el.dataset) set({ activeArea: null });
+  else if ("reset" in el.dataset) set({ health: {}, notes: {}, activeArea: null, view: "canvas" });
+});
+
+// Anotações são salvas sem re-renderizar, para não perder o foco do campo
+root.addEventListener("input", e => {
+  if (e.target.id === "notes" && state.activeArea) {
+    state.notes = { ...state.notes, [state.activeArea]: e.target.value };
+  }
+});
+
+render();
+</script>
+</body>
+</html>
