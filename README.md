@@ -1,4 +1,4 @@
-# Portal Product Ops & DesignOps
+# Portal Product Ops & DesignOps — Thayná Bordin
 
 Portal com minhas criações em Product Operations e DesignOps, publicado via GitHub Pages.
 
@@ -27,7 +27,7 @@ const CATALOG = [
 Cole este trecho logo após a abertura do `<body>` de cada criação:
 
 ```html
-<a href="./" style="position:fixed;top:16px;left:16px;z-index:9999;padding:8px 14px;border-radius:999px;background:rgba(19,17,29,.85);border:1px solid #262138;color:#ece9f5;font:500 14px/1 Inter,system-ui,sans-serif;text-decoration:none;backdrop-filter:blur(8px)">← Voltar ao início</a>
+<a href="./" style="position:fixed;top:16px;left:16px;z-index:9999;padding:.6rem 1.1rem;background:#111118;border:1px solid rgba(155,127,212,.3);color:#D4C4F0;font:400 .72rem/1 'DM Sans',system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;text-decoration:none">← Voltar ao início</a>
 ```
 
 (Para arquivos dentro de pastas, use `href="../"`.)
