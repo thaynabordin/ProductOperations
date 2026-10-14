@@ -1,0 +1,2430 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guia de Práticas de Produto</title>
+<meta name="description" content="Boas práticas para times de produto, design e tecnologia — da estratégia à medição de resultados.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+  /* Paleta alinhada ao portfólio (thaynabordin.github.io) */
+  :root {
+    --bg: #111118;
+    --bg-2: #16161f;
+    --surface: #1e1e2e;
+    --surface-2: #26263a;
+    --line: #2a2640;
+    --line-2: #3a3456;
+    --text: #F0F0F0;
+    --text-2: #A8A8C0;
+    --muted: #6B6B85;
+    --accent: #9B7FD4;
+    --accent-2: #D4C4F0;
+    --accent-soft: rgba(155, 127, 212, 0.12);
+    --accent-line: rgba(155, 127, 212, 0.45);
+    --bad: #E07A9A;
+    --good: #9fd4b4;
+    --serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+    --sans: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --header-h: 68px;
+    --sidebar-w: 268px;
+    color-scheme: dark;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  a { color: inherit; }
+  ::selection { background: var(--accent); color: #111; }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--line-2); }
+
+  /* ---------- Header ---------- */
+  .header {
+    position: fixed; inset: 0 0 auto 0; height: var(--header-h); z-index: 50;
+    display: flex; align-items: center; gap: 16px;
+    padding: 0 32px;
+    background: rgba(17, 17, 24, 0.92);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .menu-btn { display: none; width: 36px; height: 36px; align-items: center; justify-content: center; color: var(--text-2); }
+  .home-link {
+    font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted);
+    text-decoration: none; white-space: nowrap; padding-right: 16px; border-right: 1px solid var(--line-2);
+    transition: color .15s;
+  }
+  .home-link:hover { color: var(--accent-2); }
+  .brand { font-family: var(--serif); font-size: 24px; letter-spacing: 0.02em; white-space: nowrap; cursor: pointer; }
+  .brand em { color: var(--accent); font-style: italic; }
+  .header-spacer { flex: 1; }
+  .header .search { margin-right: 4px; }
+
+  .search { position: relative; width: 300px; }
+  .search input {
+    width: 100%; background: transparent; border: 0; border-bottom: 1px solid var(--line-2);
+    padding: 8px 28px 8px 0; color: var(--text); font: inherit; font-size: 14px; outline: none;
+    transition: border-color .2s;
+  }
+  .search input::placeholder { color: var(--muted); }
+  .search input:focus { border-bottom-color: var(--accent); }
+  .search kbd {
+    position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+    font-family: var(--sans); font-size: 11px; color: var(--muted);
+    border: 1px solid var(--line-2); padding: 0 6px; line-height: 18px;
+  }
+  .results {
+    position: absolute; top: calc(100% + 10px); right: 0; width: min(420px, calc(100vw - 32px));
+    background: var(--surface); border: 1px solid var(--line-2);
+    max-height: 60vh; overflow-y: auto; display: none;
+    box-shadow: 0 20px 40px rgba(0,0,0,.45);
+  }
+  .results.open { display: block; }
+  .result { display: block; width: 100%; text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .result:last-child { border-bottom: 0; }
+  .result:hover, .result.focus { background: var(--surface-2); }
+  .result-sec { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+  .result-txt { font-size: 13px; color: var(--text-2); margin-top: 2px; }
+  .result-txt mark { background: none; color: var(--text); border-bottom: 1px solid var(--accent); }
+  .result-empty { padding: 14px 16px; font-size: 13px; color: var(--muted); }
+
+
+  .lang { display: flex; align-items: center; gap: 2px; border: 1px solid var(--line-2); flex-shrink: 0; }
+  .lang button { font-size: 11px; letter-spacing: .18em; padding: 6px 8px 6px 10px; color: var(--muted); transition: color .15s, background .15s; }
+  .lang button:hover { color: var(--text); }
+  .lang button[aria-pressed="true"] { background: var(--accent); color: #111; }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar {
+    position: fixed; top: var(--header-h); left: 0; bottom: 0; width: var(--sidebar-w);
+    border-right: 1px solid var(--line); overflow-y: auto; padding: 28px 0 40px;
+    background: var(--bg); z-index: 40;
+  }
+  .nav-group { margin-bottom: 22px; }
+  .nav-label {
+    padding: 0 28px 8px; font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--muted);
+  }
+  .nav-item {
+    display: flex; align-items: baseline; gap: 12px; width: 100%; text-align: left;
+    padding: 8px 28px; font-size: 14px; color: var(--text-2);
+    border-left: 2px solid transparent; transition: color .15s, background .15s;
+  }
+  .nav-item:hover { color: var(--text); background: var(--accent-soft); }
+  .nav-item.active { color: var(--text); border-left-color: var(--accent); background: var(--accent-soft); }
+  .nav-num { font-family: var(--serif); font-style: italic; font-size: 15px; color: var(--accent); min-width: 18px; }
+  a.nav-item { text-decoration: none; }
+  .nav-home { padding-bottom: 18px; margin-bottom: 22px; border-bottom: 1px solid var(--line); }
+  .overlay { display: none; }
+
+  /* ---------- Main ---------- */
+  .main { margin-left: var(--sidebar-w); padding: calc(var(--header-h) + 56px) 56px 40px; min-height: 100vh; }
+  .content { max-width: 1000px; margin: 0 auto; }
+
+  .section { display: none; }
+  .section.active { display: block; animation: fade .35s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .eyebrow {
+    display: flex; align-items: center; gap: 16px;
+    font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .eyebrow::before { content: ""; width: 44px; height: 1px; background: var(--accent); }
+  .title {
+    font-family: var(--serif); font-weight: 400; font-size: clamp(40px, 5.4vw, 64px);
+    line-height: 1.05; letter-spacing: -0.01em; margin-bottom: 20px;
+  }
+  .title em { color: var(--accent); font-style: italic; }
+  .display { font-size: clamp(52px, 8vw, 96px); }
+  .lede { font-size: 17px; color: var(--text-2); max-width: 680px; margin-bottom: 48px; }
+
+  .block { margin-bottom: 48px; }
+  .block-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 18px; }
+  .block-head h2 { font-family: var(--serif); font-weight: 500; font-size: 28px; line-height: 1.2; }
+  .block-head span { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
+  .block-intro { color: var(--text-2); margin: -8px 0 18px; max-width: 720px; }
+
+  /* ---------- Grid & cards ---------- */
+  .grid { display: grid; gap: 16px; }
+  .g2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .g3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .g4 { grid-template-columns: repeat(4, minmax(0,1fr)); }
+  .g5 { grid-template-columns: repeat(5, minmax(0,1fr)); }
+  .g6 { grid-template-columns: repeat(6, minmax(0,1fr)); }
+
+  .card { background: var(--surface); border: 1px solid var(--line); padding: 24px; }
+  .card.hl { border-top: 1px solid var(--accent); }
+  .card.side { border-left: 1px solid var(--accent); }
+  .card.plain { background: transparent; }
+  .kicker { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .card h4 { font-family: var(--serif); font-weight: 500; font-size: 24px; line-height: 1.2; margin-bottom: 8px; }
+  .card h5 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .card p { color: var(--text-2); font-size: 14px; }
+  .card p + p { margin-top: 8px; }
+  .card .when { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px; color: var(--text-2); }
+  .card .when b { display: block; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-bottom: 4px; }
+
+  ul.list { list-style: none; }
+  ul.list li { position: relative; padding-left: 18px; color: var(--text-2); font-size: 14px; margin-bottom: 7px; }
+  ul.list li::before { content: ""; position: absolute; left: 0; top: .72em; width: 8px; height: 1px; background: var(--accent); }
+  ul.check li::before { content: "☐"; width: auto; height: auto; background: none; top: 0; color: var(--accent); font-size: 13px; }
+  ul.check li { padding-left: 22px; }
+
+  .tag {
+    display: inline-block; border: 1px solid var(--accent-line); color: var(--accent-2);
+    font-size: 10px; letter-spacing: .18em; text-transform: uppercase; padding: 4px 10px; margin: 0 6px 6px 0;
+  }
+  .tag.muted { border-color: var(--line-2); color: var(--text-2); }
+
+  .quote {
+    font-family: var(--serif); font-style: italic; font-size: 24px; line-height: 1.4; color: var(--text);
+    border-left: 1px solid var(--accent); padding: 4px 0 4px 24px; margin-bottom: 48px; max-width: 760px;
+  }
+
+  .mono { font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+  .formula {
+    font-family: var(--serif); font-size: 22px; color: var(--text); padding: 16px 0; margin: 10px 0 12px;
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  }
+  .formula em { color: var(--accent); }
+
+  /* Steps */
+  .steps { display: grid; gap: 0; }
+  .step { display: grid; grid-template-columns: 48px 1fr; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .step:last-child { border-bottom: 0; }
+  .step-n { font-family: var(--serif); font-style: italic; font-size: 24px; color: var(--accent); line-height: 1.1; }
+  .step h5 { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+  .step p { font-size: 14px; color: var(--text-2); }
+
+  /* Compare */
+  .compare { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .compare:last-child { border-bottom: 0; }
+  .compare .from { color: var(--text-2); font-size: 14px; }
+  .compare .to { color: var(--text); font-size: 14px; }
+  .compare .lbl { display: block; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; margin-bottom: 4px; }
+  .compare .from .lbl { color: var(--bad); }
+  .compare .to .lbl { color: var(--good); }
+  .compare .arrow { color: var(--accent); font-family: var(--serif); font-size: 22px; }
+
+  /* Table */
+  .table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .table th { text-align: left; font-weight: 500; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); padding: 0 16px 12px 0; border-bottom: 1px solid var(--line-2); }
+  .table td { padding: 14px 16px 14px 0; border-bottom: 1px solid var(--line); color: var(--text-2); vertical-align: top; }
+  .table td:first-child { color: var(--text); }
+  .table td .go { color: var(--accent-2); border-bottom: 1px solid var(--accent-line); }
+  .table-wrap { overflow-x: auto; }
+
+  /* Overview stages */
+  .stage { position: relative; padding: 28px 24px; }
+  .stage-n { font-family: var(--serif); font-style: italic; font-size: 40px; color: var(--accent); line-height: 1; margin-bottom: 14px; }
+  .stage h4 { font-size: 28px; }
+  .stage .q { font-family: var(--serif); font-style: italic; color: var(--text-2); font-size: 18px; margin-bottom: 16px; }
+  .stage-links { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--line); padding-top: 14px; }
+  .link-btn { text-align: left; font-size: 13px; color: var(--text-2); display: flex; justify-content: space-between; }
+  .link-btn:hover { color: var(--accent-2); }
+  .link-btn::after { content: "→"; color: var(--accent); }
+  .loop-note { text-align: center; font-family: var(--serif); font-style: italic; color: var(--muted); font-size: 17px; margin-top: 16px; }
+
+  /* Hierarchy */
+  .hier { display: grid; gap: 8px; }
+  .hier-row { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; padding: 16px 20px; background: var(--surface); border: 1px solid var(--line); border-left: 1px solid var(--accent); }
+  .hier-row h5 { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--text); margin-bottom: 2px; }
+  .hier-row p { font-size: 13px; color: var(--text-2); }
+  .hier-row .hz { font-family: var(--serif); font-style: italic; color: var(--accent-2); font-size: 15px; white-space: nowrap; }
+
+  /* Horizons */
+  .horizon { padding: 24px; border: 1px solid var(--line); }
+  .horizon .range { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
+  .horizon h4 { font-family: var(--serif); font-weight: 500; font-size: 30px; margin: 4px 0 6px; }
+  .horizon p { color: var(--text-2); font-size: 14px; }
+  .conf { display: flex; gap: 4px; margin-top: 16px; }
+  .conf i { flex: 1; height: 3px; background: var(--line-2); }
+  .conf i.on { background: var(--accent); }
+
+  /* Matrix */
+  .matrix { display: grid; grid-template-columns: 28px 1fr 1fr; grid-template-rows: 1fr 1fr 28px; gap: 8px; }
+  .matrix .cell { padding: 18px; border: 1px solid var(--line); background: var(--surface); }
+  .matrix .cell.best { border-color: var(--accent-line); background: var(--accent-soft); }
+  .matrix .cell h5 { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+  .matrix .cell p { font-size: 13px; color: var(--text-2); }
+  .axis { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; justify-content: center; }
+  .axis.y { writing-mode: vertical-rl; transform: rotate(180deg); grid-row: 1 / 3; }
+  .axis.x { grid-column: 2 / 4; }
+
+  /* Calculator */
+  .calc { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)) auto; gap: 14px; align-items: end; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); }
+  .calc label { display: block; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .calc input, .calc select {
+    width: 100%; background: var(--bg); border: 1px solid var(--line-2); color: var(--text);
+    padding: 9px 10px; font: inherit; font-size: 14px; outline: none; border-radius: 0;
+  }
+  .calc input:focus, .calc select:focus { border-color: var(--accent); }
+  .score { text-align: right; min-width: 110px; }
+  .score b { display: block; font-family: var(--serif); font-size: 40px; font-weight: 500; color: var(--accent); line-height: 1; }
+  .score span { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+
+  /* MoSCoW */
+  .moscow { padding: 20px; border: 1px solid var(--line); }
+  .moscow .letter { font-family: var(--serif); font-size: 44px; line-height: 1; color: var(--accent); }
+  .moscow h5 { font-size: 15px; font-weight: 600; margin: 8px 0 4px; }
+  .moscow p { font-size: 13px; color: var(--text-2); }
+  .moscow.m1 { background: rgba(155,127,212,.18); border-color: var(--accent-line); }
+  .moscow.m2 { background: rgba(155,127,212,.10); }
+  .moscow.m3 { background: rgba(155,127,212,.04); }
+
+  /* Diamond */
+  .diamond { width: 100%; height: auto; display: block; margin-bottom: 8px; }
+  .phase { padding: 18px 0 0; border-top: 1px solid var(--line-2); }
+  .phase .mode { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
+  .phase h5 { font-family: var(--serif); font-size: 22px; font-weight: 500; margin: 2px 0 4px; }
+  .phase p { font-size: 13px; color: var(--text-2); }
+
+  /* Case */
+  .case dl { display: grid; gap: 10px; }
+  .case dt { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+  .case dd { font-size: 14px; color: var(--text-2); margin-top: 2px; }
+
+  /* Template */
+  .template { font-family: var(--serif); font-size: 22px; line-height: 1.6; color: var(--text-2); }
+  .template b { font-weight: 500; color: var(--text); }
+  .template em { color: var(--accent-2); }
+
+  /* Iceberg */
+  .iceberg { display: grid; gap: 6px; justify-items: center; }
+  .ice { padding: 16px 20px; border: 1px solid var(--line); background: var(--surface); text-align: center; }
+  .ice h5 { font-size: 14px; font-weight: 600; }
+  .ice p { font-size: 13px; color: var(--text-2); }
+  .ice.i1 { width: 46%; border-color: var(--accent-line); background: var(--accent-soft); }
+  .ice.i2 { width: 72%; }
+  .ice.i3 { width: 100%; background: transparent; border-style: dashed; }
+
+  /* Fibonacci */
+  .fib { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 12px; }
+  .fib span {
+    width: 44px; height: 56px; display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--line-2); font-family: var(--serif); font-size: 22px;
+  }
+  .fib span.lo { border-color: var(--accent-line); background: var(--accent-soft); }
+  .fib span.hi { color: var(--muted); }
+  .special { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .special div { text-align: center; }
+  .special b { display: flex; align-items: center; justify-content: center; width: 44px; height: 56px; margin: 0 auto 8px; border: 1px solid var(--accent-line); color: var(--accent-2); font-family: var(--serif); font-size: 22px; font-weight: 500; }
+  .special p { font-size: 12px; color: var(--text-2); }
+
+  .spidr p { margin-bottom: 8px; }
+  .spidr b { font-family: var(--serif); font-size: 20px; color: var(--accent); font-weight: 500; margin-right: 6px; }
+
+  /* Cadence */
+  .cadence { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); border: 1px solid var(--line); }
+  .cad { padding: 20px; border-right: 1px solid var(--line); }
+  .cad:last-child { border-right: 0; }
+  .cad .freq { font-family: var(--serif); font-style: italic; font-size: 20px; color: var(--accent); margin-bottom: 8px; }
+  .cad p { font-size: 13px; color: var(--text-2); }
+
+  /* Ceremony */
+  .cer-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .dur { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+  .cer-freq { font-size: 13px; color: var(--accent-2); margin-bottom: 12px; }
+  .tip { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); font-family: var(--serif); font-style: italic; font-size: 16px; color: var(--text-2); }
+
+  /* Metric letters */
+  .letter-card .big { font-family: var(--serif); font-size: 40px; line-height: 1; color: var(--accent); }
+  .letter-card h5 { font-size: 14px; font-weight: 600; margin: 8px 0 4px; }
+  .letter-card p { font-size: 13px; color: var(--text-2); }
+  .letter-card .ex { margin-top: 10px; font-size: 12px; color: var(--muted); font-style: italic; }
+
+  .def-row { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); border: 1px solid var(--line); }
+  .def-row div { padding: 16px; border-right: 1px solid var(--line); }
+  .def-row div:last-child { border-right: 0; }
+  .def-row b { display: block; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; font-weight: 500; }
+  .def-row span { font-size: 13px; color: var(--text-2); }
+
+  /* Glossary */
+  .gloss-filter { margin-bottom: 24px; max-width: 360px; }
+  .gloss-filter input {
+    width: 100%; background: transparent; border: 0; border-bottom: 1px solid var(--line-2);
+    padding: 8px 0; color: var(--text); font: inherit; outline: none;
+  }
+  .gloss-filter input:focus { border-bottom-color: var(--accent); }
+  .term { padding: 20px 0; border-top: 1px solid var(--line); }
+  .term h5 { font-family: var(--serif); font-weight: 500; font-size: 22px; margin-bottom: 4px; }
+  .term p { font-size: 14px; color: var(--text-2); }
+  .gloss-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); column-gap: 32px; }
+  .gloss-empty { color: var(--muted); display: none; }
+
+  /* Pager */
+  .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--line); }
+  .pager button { text-align: left; padding: 8px 0; }
+  .pager button.next { text-align: right; grid-column: 2; }
+  .pager small { display: block; font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
+  .pager span { font-family: var(--serif); font-size: 22px; color: var(--text); }
+  .pager button:hover span { color: var(--accent-2); }
+
+  .footer { margin-left: var(--sidebar-w); padding: 28px 56px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--muted); letter-spacing: .04em; }
+  .footer em { font-family: var(--serif); font-size: 15px; color: var(--accent); }
+
+  .flash { animation: flash 1.6s ease; }
+  @keyframes flash { 0%, 40% { background-color: var(--accent-soft); outline: 1px solid var(--accent-line); } 100% { background-color: transparent; outline-color: transparent; } }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1180px) {
+    .g4, .g5, .g6 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .g3 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .gloss-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .def-row { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    .def-row div:nth-child(3) { border-right: 0; }
+    .def-row div:nth-child(-n+3) { border-bottom: 1px solid var(--line); }
+    .calc { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .score { grid-column: 1 / -1; text-align: left; }
+  }
+  @media (max-width: 960px) {
+    :root { --header-h: 60px; }
+    .header { padding: 0 16px; }
+    .menu-btn { display: flex; }
+    .home-link { display: none; }
+    .sidebar { transform: translateX(-100%); transition: transform .25s ease; width: 280px; }
+    body.nav-open .sidebar { transform: none; }
+    body.nav-open .overlay { display: block; position: fixed; inset: var(--header-h) 0 0 0; background: rgba(0,0,0,.55); z-index: 35; }
+    .main { margin-left: 0; padding: calc(var(--header-h) + 36px) 24px 32px; }
+    .footer { margin-left: 0; padding: 24px; }
+    .search { width: 220px; }
+    .cadence { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .cad:nth-child(2) { border-right: 0; }
+    .cad:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  }
+  @media (max-width: 640px) {
+    .main { padding: calc(var(--header-h) + 28px) 16px 24px; }
+    .footer { padding: 20px 16px; }
+    .brand { font-size: 20px; }
+    .search { width: auto; flex: 1; min-width: 90px; max-width: 200px; }
+    .search kbd { display: none; }
+    .brand em { display: none; }
+    .results { position: fixed; top: calc(var(--header-h) + 6px); left: 16px; right: 16px; width: auto; }
+    .header { gap: 10px; }
+    .lang button { padding: 6px 6px 6px 8px; }
+    .block-head { flex-wrap: wrap; gap: 4px 14px; }
+    .g2, .g3, .g4, .g5, .g6, .gloss-grid { grid-template-columns: 1fr; }
+    .cadence { grid-template-columns: 1fr; }
+    .cad { border-right: 0 !important; border-bottom: 1px solid var(--line); }
+    .cad:last-child { border-bottom: 0; }
+    .def-row { grid-template-columns: 1fr 1fr; }
+    .def-row div { border-right: 0 !important; border-bottom: 1px solid var(--line); }
+    .compare { grid-template-columns: 1fr; gap: 6px; }
+    .compare .arrow { transform: rotate(90deg); width: 20px; }
+    .calc { grid-template-columns: 1fr 1fr; }
+    .ice.i1 { width: 70%; } .ice.i2 { width: 86%; }
+    .quote { font-size: 20px; }
+    .lede { font-size: 16px; }
+    .hier-row { grid-template-columns: 1fr; gap: 6px; }
+    .hier-row[style] { margin-left: 0 !important; }
+    .pager span { font-size: 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <button class="menu-btn" id="menuBtn" aria-label="Abrir menu">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg>
+  </button>
+  <a class="home-link" id="homeLink" href="./">← Portal</a>
+  <div class="brand" id="brand" data-go="inicio">Guia de práticas <em>de produto</em></div>
+  <div class="header-spacer"></div>
+  <div class="search">
+    <input type="search" id="searchInput" placeholder="Buscar no guia…" autocomplete="off" aria-label="Buscar no guia">
+    <kbd>/</kbd>
+    <div class="results" id="results" role="listbox"></div>
+  </div>
+  <div class="lang" role="group" aria-label="Idioma / Language">
+    <button type="button" data-lang="pt" aria-pressed="true">PT</button>
+    <button type="button" data-lang="en" aria-pressed="false">EN</button>
+  </div>
+</header>
+
+<nav class="sidebar" id="sidebar" aria-label="Seções">
+</nav>
+<div class="overlay" id="overlay"></div>
+
+<main class="main">
+<div class="content" id="content">
+</div>
+</main>
+
+
+<template id="tpl-nav-pt">
+  <div class="nav-home">
+    <a class="nav-item" href="./"><span class="nav-num">←</span>Portal de criações</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Visão geral</div>
+    <button class="nav-item" data-go="inicio"><span class="nav-num">—</span>Início</button>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Estratégia</div>
+    <button class="nav-item" data-go="okrs"><span class="nav-num">01</span>OKRs</button>
+    <button class="nav-item" data-go="roadmap"><span class="nav-num">02</span>Roadmap</button>
+    <button class="nav-item" data-go="priorizacao"><span class="nav-num">03</span>Priorização</button>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Descoberta</div>
+    <button class="nav-item" data-go="upstream"><span class="nav-num">04</span>Upstream e Downstream</button>
+    <button class="nav-item" data-go="discovery"><span class="nav-num">05</span>Do problema à solução</button>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Entrega</div>
+    <button class="nav-item" data-go="estrutura"><span class="nav-num">06</span>Estrutura do trabalho</button>
+    <button class="nav-item" data-go="backlog"><span class="nav-num">07</span>Backlog e refinamento</button>
+    <button class="nav-item" data-go="estimativas"><span class="nav-num">08</span>Estimativas</button>
+    <button class="nav-item" data-go="rituais"><span class="nav-num">09</span>Rituais</button>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Aprendizado</div>
+    <button class="nav-item" data-go="resultados"><span class="nav-num">10</span>Medir resultados</button>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Referência</div>
+    <button class="nav-item" data-go="glossario"><span class="nav-num">11</span>Glossário</button>
+  </div>
+</template>
+<template id="tpl-main-pt">
+
+<!-- ===================== INÍCIO ===================== -->
+<section class="section" id="inicio" data-title="Início">
+  <div class="eyebrow">Product Ops · Framework</div>
+  <h1 class="title display">Guia de práticas de <em>produto</em></h1>
+  <p class="lede">Boas práticas para times de produto, design e tecnologia trabalharem com a mesma linguagem, da estratégia à medição de resultados.</p>
+
+  <div class="block">
+    <div class="block-head"><h2>O ciclo do produto</h2><span>Como o guia se organiza</span></div>
+    <div class="grid g4">
+      <div class="card stage">
+        <div class="stage-n">01</div>
+        <h4>Estratégia</h4>
+        <p class="q">Para onde vamos e por quê?</p>
+        <div class="stage-links">
+          <button class="link-btn" data-go="okrs">OKRs</button>
+          <button class="link-btn" data-go="roadmap">Roadmap</button>
+          <button class="link-btn" data-go="priorizacao">Priorização</button>
+        </div>
+      </div>
+      <div class="card stage">
+        <div class="stage-n">02</div>
+        <h4>Descoberta</h4>
+        <p class="q">Qual problema vale resolver?</p>
+        <div class="stage-links">
+          <button class="link-btn" data-go="upstream">Upstream e Downstream</button>
+          <button class="link-btn" data-go="discovery">Do problema à solução</button>
+        </div>
+      </div>
+      <div class="card stage">
+        <div class="stage-n">03</div>
+        <h4>Entrega</h4>
+        <p class="q">Como construímos bem?</p>
+        <div class="stage-links">
+          <button class="link-btn" data-go="estrutura">Estrutura do trabalho</button>
+          <button class="link-btn" data-go="backlog">Backlog</button>
+          <button class="link-btn" data-go="estimativas">Estimativas</button>
+          <button class="link-btn" data-go="rituais">Rituais</button>
+        </div>
+      </div>
+      <div class="card stage">
+        <div class="stage-n">04</div>
+        <h4>Aprendizado</h4>
+        <p class="q">O que mudou de verdade?</p>
+        <div class="stage-links">
+          <button class="link-btn" data-go="resultados">Medir resultados</button>
+          <button class="link-btn" data-go="glossario">Glossário</button>
+        </div>
+      </div>
+    </div>
+    <p class="loop-note">O que aprendemos alimenta a próxima estratégia.</p>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Princípios</h2><span>O que guia todas as práticas</span></div>
+    <div class="grid g3">
+      <div class="card hl"><div class="kicker">01</div><h4>Resultados antes de entregas</h4><p>Sucesso é mudar um comportamento ou uma métrica que importa, não entregar mais funcionalidades.</p></div>
+      <div class="card hl"><div class="kicker">02</div><h4>Problema antes da solução</h4><p>Investigar a causa antes de investir em construção. A ideia mais barata é a que descartamos cedo.</p></div>
+      <div class="card hl"><div class="kicker">03</div><h4>Decisões explícitas</h4><p>Critérios de priorização, trade-offs e compromissos ficam visíveis para todos os envolvidos.</p></div>
+      <div class="card hl"><div class="kicker">04</div><h4>Cadência sustentável</h4><p>Rituais curtos e com propósito claro, num ritmo que o time consegue manter ao longo do tempo.</p></div>
+      <div class="card hl"><div class="kicker">05</div><h4>O processo também é produto</h4><p>Práticas são hipóteses: meça, revise e ajuste quando deixarem de gerar valor.</p></div>
+      <div class="card hl"><div class="kicker">06</div><h4>Linguagem comum</h4><p>Termos e artefatos padronizados reduzem ruído entre produto, design, tecnologia e negócio.</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Como usar</h2></div>
+    <div class="card plain">
+      <ul class="list">
+        <li>Consulte por tema. Cada seção funciona de forma independente.</li>
+        <li>Adapte ao contexto: tamanho do time, maturidade e tipo de produto mudam o que faz sentido aplicar.</li>
+        <li>Use como base para onboarding de novas pessoas e para acordos de trabalho entre times.</li>
+        <li>Pressione <span class="tag muted" style="margin:0 2px">/</span> para buscar qualquer termo.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== OKRs ===================== -->
+<section class="section" id="okrs" data-title="OKRs">
+  <div class="eyebrow">01 · Estratégia</div>
+  <h1 class="title">Gestão de <em>OKRs</em></h1>
+  <p class="lede">Objectives and Key Results conectam a estratégia a resultados mensuráveis. Dão foco ao time e deixam autonomia para escolher como chegar lá.</p>
+
+  <div class="block">
+    <div class="block-head"><h2>Anatomia</h2></div>
+    <div class="grid g3">
+      <div class="card hl"><div class="kicker">O quê</div><h4>Objetivo</h4><p>Qualitativo, inspirador e com prazo. Responde à pergunta "o que queremos alcançar?".</p></div>
+      <div class="card hl"><div class="kicker">Como saberemos</div><h4>Key Results</h4><p>De 3 a 5 por objetivo. Quantitativos, com baseline e meta, e medem resultado, não tarefa.</p></div>
+      <div class="card hl"><div class="kicker">O que vamos tentar</div><h4>Iniciativas</h4><p>Apostas que acreditamos que vão mover os KRs. Podem mudar durante o ciclo sem que o OKR mude.</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Resultado, não entrega</h2><span>O erro mais comum</span></div>
+    <div class="card">
+      <div class="compare">
+        <div class="from"><span class="lbl">✗ KR como entrega</span>Lançar o novo fluxo de cadastro até março</div>
+        <div class="arrow">→</div>
+        <div class="to"><span class="lbl">✓ KR como resultado</span>Aumentar a conclusão do cadastro de 40% para 60% até março</div>
+      </div>
+      <div class="compare">
+        <div class="from"><span class="lbl">✗ KR como atividade</span>Realizar 10 entrevistas com clientes</div>
+        <div class="arrow">→</div>
+        <div class="to"><span class="lbl">✓ KR como resultado</span>Reduzir o cancelamento no primeiro mês de 25% para 15%</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block grid g2">
+    <div class="card">
+      <div class="kicker">Ciclo</div>
+      <div class="steps">
+        <div class="step"><span class="step-n">01</span><div><h5>Definir objetivos</h5><p>Direção da liderança combinada com propostas dos times.</p></div></div>
+        <div class="step"><span class="step-n">02</span><div><h5>Escrever os KRs</h5><p>Cada KR com métrica, baseline, meta e fonte de dados.</p></div></div>
+        <div class="step"><span class="step-n">03</span><div><h5>Atribuir donos</h5><p>Uma pessoa responsável por acompanhar cada KR.</p></div></div>
+        <div class="step"><span class="step-n">04</span><div><h5>Acompanhar</h5><p>Check-in semanal de progresso e de confiança na meta.</p></div></div>
+        <div class="step"><span class="step-n">05</span><div><h5>Revisar e aprender</h5><p>No fim do ciclo, avaliar o que funcionou e levar isso ao próximo.</p></div></div>
+      </div>
+    </div>
+    <div class="grid" style="align-content:start">
+      <div class="card side">
+        <div class="kicker">Exemplo · Plataforma de cursos</div>
+        <h4>Fazer os alunos chegarem ao fim do que começam</h4>
+        <p><b style="color:var(--accent-2)">KR1</b> Conclusão de cursos de 12% para 25%</p>
+        <p><b style="color:var(--accent-2)">KR2</b> Alunos ativos na 2ª semana de 40% para 55%</p>
+        <p><b style="color:var(--accent-2)">KR3</b> Avaliação média das aulas de 4,1 para 4,5</p>
+      </div>
+      <div class="card side">
+        <div class="kicker">Exemplo · App de receitas</div>
+        <h4>Fazer do app parte da rotina na cozinha</h4>
+        <p><b style="color:var(--accent-2)">KR1</b> Receitas preparadas por usuário ativo de 1,2 para 2 por mês</p>
+        <p><b style="color:var(--accent-2)">KR2</b> Retenção D30 de 18% para 25%</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="block grid g2">
+    <div class="card">
+      <div class="kicker">Boas práticas</div>
+      <ul class="list">
+        <li>Poucos objetivos por ciclo. Foco vale mais que cobertura.</li>
+        <li>Separe OKRs comprometidos (precisam ser atingidos) de ambiciosos (atingir ~70% já é bom resultado).</li>
+        <li>Revise as iniciativas sempre que os dados mostrarem que não movem o KR.</li>
+        <li>Mantenha os OKRs públicos para todos os times.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="kicker">Evite</div>
+      <ul class="list">
+        <li>KRs que são listas de tarefas ou entregas</li>
+        <li>KRs sem baseline, que não permitem medir avanço</li>
+        <li>Vincular OKRs à avaliação individual, o que desestimula metas ambiciosas</li>
+        <li>Definir no início e só olhar de novo no fim do ciclo</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Papéis</h2></div>
+    <div class="grid g4">
+      <div class="card plain"><h5>Liderança</h5><p>Define a direção e os objetivos de nível mais alto.</p></div>
+      <div class="card plain"><h5>Product Manager</h5><p>Traduz a direção em OKRs do time e conduz o acompanhamento.</p></div>
+      <div class="card plain"><h5>Time</h5><p>Propõe iniciativas e é dono de como alcançar os resultados.</p></div>
+      <div class="card plain"><h5>Stakeholders</h5><p>Alinham expectativas e acompanham o progresso.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ROADMAP ===================== -->
+<section class="section" id="roadmap" data-title="Roadmap">
+  <div class="eyebrow">02 · Estratégia</div>
+  <h1 class="title">Roadmap <em>estratégico</em></h1>
+  <p class="lede">Comunica a direção do produto ao longo do tempo. É uma ferramenta de alinhamento, não uma lista de promessas com datas.</p>
+
+  <div class="block">
+    <div class="block-head"><h2>Formatos</h2><span>Escolha pelo nível de incerteza</span></div>
+    <div class="grid g3">
+      <div class="card hl">
+        <div class="kicker">Por horizonte</div>
+        <h4>Now · Next · Later</h4>
+        <p>Organiza por horizonte de tempo, sem datas. "Now" está em execução, "Next" está validado e priorizado, "Later" reúne apostas e oportunidades.</p>
+        <div class="when"><b>Quando usar</b>Produtos com alta incerteza e times que precisam de flexibilidade para reagir a aprendizados.</div>
+      </div>
+      <div class="card hl">
+        <div class="kicker">Por resultado</div>
+        <h4>Orientado a outcomes</h4>
+        <p>Organiza por problemas a resolver ou métricas a mover, ligados aos OKRs. As soluções aparecem como hipóteses, não como compromissos.</p>
+        <div class="when"><b>Quando usar</b>Para alinhar a liderança em torno de impacto e dar autonomia aos times para encontrar soluções.</div>
+      </div>
+      <div class="card hl">
+        <div class="kicker">Por data</div>
+        <h4>Timeline</h4>
+        <p>Organiza entregas e marcos num calendário. Deixa dependências e prazos visíveis.</p>
+        <div class="when"><b>Quando usar</b>Quando há datas externas reais: obrigações regulatórias, lançamentos coordenados, contratos.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Horizontes de confiança</h2></div>
+    <p class="block-intro">Quanto mais distante, menos detalhe e menos compromisso. Comunique isso de forma explícita.</p>
+    <div class="grid g3">
+      <div class="horizon" style="background:var(--accent-soft);border-color:var(--accent-line)"><div class="range">1 a 3 meses</div><h4>Agora</h4><p>Itens em execução ou prontos para começar, com escopo definido.</p><div class="conf"><i class="on"></i><i class="on"></i><i class="on"></i></div></div>
+      <div class="horizon"><div class="range">3 a 6 meses</div><h4>Próximo</h4><p>Problemas priorizados, em discovery ou com solução em validação.</p><div class="conf"><i class="on"></i><i class="on"></i><i></i></div></div>
+      <div class="horizon" style="border-style:dashed"><div class="range">6+ meses</div><h4>Depois</h4><p>Direção estratégica, oportunidades e grandes apostas.</p><div class="conf"><i class="on"></i><i></i><i></i></div></div>
+    </div>
+  </div>
+
+  <div class="block grid g2">
+    <div class="card">
+      <div class="kicker">Dinâmica</div>
+      <div class="steps">
+        <div class="step"><span class="step-n">01</span><div><h5>Coletar inputs</h5><p>Estratégia, OKRs, dados de uso, pesquisa e demandas de stakeholders.</p></div></div>
+        <div class="step"><span class="step-n">02</span><div><h5>Priorizar</h5><p>Com critérios explícitos. Veja a seção <button class="go" data-go="priorizacao" style="color:var(--accent-2);border-bottom:1px solid var(--accent-line)">Priorização</button>.</p></div></div>
+        <div class="step"><span class="step-n">03</span><div><h5>Comunicar por público</h5><p>O mesmo roadmap, com níveis de detalhe diferentes para cada audiência.</p></div></div>
+        <div class="step"><span class="step-n">04</span><div><h5>Revisar</h5><p>Mensalmente no detalhe e trimestralmente na direção.</p></div></div>
+      </div>
+    </div>
+    <div class="grid" style="align-content:start">
+      <div class="card">
+        <div class="kicker">Por público</div>
+        <p><b style="color:var(--text)">Liderança:</b> temas, resultados esperados e apostas.</p>
+        <p><b style="color:var(--text)">Time:</b> problemas, prioridades e dependências.</p>
+        <p><b style="color:var(--text)">Clientes e áreas parceiras:</b> benefícios esperados, sem datas exatas quando a incerteza é alta.</p>
+      </div>
+      <div class="card" style="border-left:1px solid var(--bad)">
+        <div class="kicker" style="color:var(--bad)">Antipadrões</div>
+        <ul class="list">
+          <li>Roadmap como lista de funcionalidades prometidas</li>
+          <li>Datas fixas sem margem para descobertas</li>
+          <li>Itens sem conexão com OKRs ou métricas</li>
+          <li>Documento criado uma vez e nunca revisado</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PRIORIZAÇÃO ===================== -->
+<section class="section" id="priorizacao" data-title="Priorização">
+  <div class="eyebrow">03 · Estratégia</div>
+  <h1 class="title">Frameworks de <em>priorização</em></h1>
+  <p class="lede">Nenhum framework decide sozinho. Eles tornam os critérios explícitos e deixam a conversa mais objetiva. Use os números para comparar, não para encerrar a discussão.</p>
+
+  <div class="block">
+    <div class="block-head"><h2>Qual usar?</h2></div>
+    <div class="card table-wrap">
+      <table class="table">
+        <thead><tr><th>Situação</th><th>Framework</th></tr></thead>
+        <tbody>
+          <tr><td>Triagem rápida de ideias em um workshop</td><td><span class="go">Valor × Esforço</span></td></tr>
+          <tr><td>Comparar muitas iniciativas quando há dados de uso</td><td><span class="go">RICE</span></td></tr>
+          <tr><td>Experimentos e decisões rápidas de crescimento</td><td><span class="go">ICE</span></td></tr>
+          <tr><td>Fechar o escopo de uma entrega com prazo fixo</td><td><span class="go">MoSCoW</span></td></tr>
+          <tr><td>Vários times disputando capacidade, quando o tempo altera o valor</td><td><span class="go">WSJF / Custo do atraso</span></td></tr>
+          <tr><td>Entender o que é básico e o que encanta para o usuário</td><td><span class="go">Kano</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Valor × Esforço</h2><span>Matriz 2×2</span></div>
+    <div class="matrix">
+      <div class="axis y">Valor ↑</div>
+      <div class="cell best"><h5>Ganhos rápidos</h5><p>Alto valor, baixo esforço. Fazer primeiro.</p></div>
+      <div class="cell"><h5>Grandes apostas</h5><p>Alto valor, alto esforço. Planejar e fatiar.</p></div>
+      <div class="cell"><h5>Ajustes</h5><p>Baixo valor, baixo esforço. Fazer se sobrar capacidade.</p></div>
+      <div class="cell" style="background:transparent;border-style:dashed"><h5>Evitar</h5><p>Baixo valor, alto esforço. Descartar ou repensar.</p></div>
+      <div class="axis x">Esforço →</div>
+    </div>
+  </div>
+
+  <div class="block grid g2">
+    <div class="card hl" style="grid-column:1/-1">
+      <div class="kicker">RICE</div>
+      <h4>Alcance, Impacto, Confiança e Esforço</h4>
+      <div class="formula">(<em>Alcance</em> × <em>Impacto</em> × <em>Confiança</em>) ÷ <em>Esforço</em></div>
+      <div class="grid g4">
+        <div><h5>Alcance</h5><p>Quantas pessoas são afetadas num período (ex.: usuários por trimestre).</p></div>
+        <div><h5>Impacto</h5><p>Quanto muda para cada pessoa: 3 massivo, 2 alto, 1 médio, 0,5 baixo, 0,25 mínimo.</p></div>
+        <div><h5>Confiança</h5><p>Quão sólidas são as evidências: 100% alta, 80% média, 50% baixa.</p></div>
+        <div><h5>Esforço</h5><p>Trabalho total do time, em pessoa-semanas ou pessoa-meses.</p></div>
+      </div>
+      <div class="calc" id="rice">
+        <div><label for="rReach">Alcance</label><input id="rReach" type="number" min="0" value="2000"></div>
+        <div><label for="rImpact">Impacto</label>
+          <select id="rImpact"><option value="3">3 · Massivo</option><option value="2" selected>2 · Alto</option><option value="1">1 · Médio</option><option value="0.5">0,5 · Baixo</option><option value="0.25">0,25 · Mínimo</option></select></div>
+        <div><label for="rConf">Confiança</label>
+          <select id="rConf"><option value="1">100% · Alta</option><option value="0.8" selected>80% · Média</option><option value="0.5">50% · Baixa</option></select></div>
+        <div><label for="rEffort">Esforço</label><input id="rEffort" type="number" min="0.1" step="0.5" value="4"></div>
+        <div class="score"><b id="rScore">800</b><span>Score RICE</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="kicker">ICE</div>
+      <h4>Impacto, Confiança e Facilidade</h4>
+      <div class="formula"><em>Impacto</em> × <em>Confiança</em> × <em>Facilidade</em></div>
+      <p>Cada critério recebe nota de 1 a 10. É mais leve que o RICE e útil para comparar experimentos rapidamente.</p>
+      <div class="when"><b>Atenção</b>Notas são subjetivas. Calibre com o time e revise depois de ter resultados.</div>
+    </div>
+    <div class="card">
+      <div class="kicker">WSJF · Custo do atraso</div>
+      <h4>Weighted Shortest Job First</h4>
+      <div class="formula">(<em>Valor</em> + <em>Urgência</em> + <em>Redução de risco</em>) ÷ <em>Tamanho</em></div>
+      <p>Prioriza o que gera mais valor por unidade de tempo e mostra quanto custa esperar.</p>
+      <div class="when"><b>Atenção</b>Funciona melhor com notas relativas (escala de Fibonacci) comparando itens entre si.</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>MoSCoW</h2><span>Para escopo com prazo fixo</span></div>
+    <div class="grid g4">
+      <div class="moscow m1"><div class="letter">M</div><h5>Must have</h5><p>Sem isso a entrega não funciona ou não faz sentido.</p></div>
+      <div class="moscow m2"><div class="letter">S</div><h5>Should have</h5><p>Importante, mas há como contornar temporariamente.</p></div>
+      <div class="moscow m3"><div class="letter">C</div><h5>Could have</h5><p>Desejável, entra se houver capacidade.</p></div>
+      <div class="moscow"><div class="letter" style="color:var(--muted)">W</div><h5>Won't have (agora)</h5><p>Fora deste escopo, registrado para depois.</p></div>
+    </div>
+    <p class="block-intro" style="margin-top:14px">Referência comum: os "Must" não devem passar de ~60% do esforço, o que deixa margem para imprevistos.</p>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Modelo Kano</h2><span>Percepção de valor</span></div>
+    <div class="grid g3">
+      <div class="card"><div class="kicker">Básicos</div><h4>Obrigatórios</h4><p>Sua ausência gera insatisfação, mas sua presença não encanta. Ex.: o login funcionar.</p></div>
+      <div class="card"><div class="kicker">Desempenho</div><h4>Quanto mais, melhor</h4><p>A satisfação cresce junto com a qualidade. Ex.: velocidade, menos passos.</p></div>
+      <div class="card"><div class="kicker">Encantadores</div><h4>Surpreendem</h4><p>Ninguém pede, mas geram entusiasmo. Com o tempo, viram básicos.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== UPSTREAM ===================== -->
+<section class="section" id="upstream" data-title="Upstream e Downstream">
+  <div class="eyebrow">04 · Descoberta</div>
+  <h1 class="title">Upstream e <em>Downstream</em></h1>
+  <p class="lede">Separar concepção de execução garante que o time entenda o problema antes de investir em desenvolvimento. As duas trilhas correm em paralelo e se alimentam o tempo todo.</p>
+
+  <div class="block grid g2">
+    <div class="card hl">
+      <div class="kicker">Upstream · Concepção</div>
+      <h4>Decidir o que construir</h4>
+      <div class="steps">
+        <div class="step"><span class="step-n">01</span><div><h5>Explorar o problema</h5><p>Entender a raiz da demanda.</p></div></div>
+        <div class="step"><span class="step-n">02</span><div><h5>Conectar à estratégia</h5><p>Relacionar com visão e OKRs.</p></div></div>
+        <div class="step"><span class="step-n">03</span><div><h5>Conduzir discovery</h5><p>Pesquisar e testar hipóteses.</p></div></div>
+        <div class="step"><span class="step-n">04</span><div><h5>Validar a solução mínima</h5><p>Protótipos e testes com usuários.</p></div></div>
+      </div>
+    </div>
+    <div class="card" style="border-top:1px solid var(--line-2)">
+      <div class="kicker" style="color:var(--text-2)">Downstream · Execução</div>
+      <h4>Construir bem</h4>
+      <div class="steps">
+        <div class="step"><span class="step-n">01</span><div><h5>Detalhar requisitos</h5><p>Histórias com critérios de aceite claros.</p></div></div>
+        <div class="step"><span class="step-n">02</span><div><h5>Desenvolver</h5><p>Entregas incrementais em ciclos curtos.</p></div></div>
+        <div class="step"><span class="step-n">03</span><div><h5>Testar e homologar</h5><p>Qualidade e validação com o negócio.</p></div></div>
+        <div class="step"><span class="step-n">04</span><div><h5>Medir o impacto</h5><p>Comparar resultado com a métrica de sucesso.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block grid g2">
+    <div class="card side">
+      <div class="kicker">Critérios de passagem</div>
+      <h4>Pronto para o downstream quando…</h4>
+      <ul class="list check">
+        <li>O problema foi validado com evidências</li>
+        <li>A métrica de sucesso tem baseline e meta</li>
+        <li>A solução foi testada com usuários</li>
+        <li>A viabilidade técnica foi confirmada</li>
+        <li>Há histórias com critérios de aceite (Definition of Ready)</li>
+      </ul>
+    </div>
+    <div class="grid" style="align-content:start">
+      <div class="card"><h5>Não pule etapas do upstream</h5><p>Construir rápido a coisa errada custa mais que descobrir devagar a coisa certa.</p></div>
+      <div class="card"><h5>Defina sucesso antes de construir</h5><p>Sem métrica definida antes, não há como saber depois se funcionou.</p></div>
+      <div class="card"><h5>Feche o ciclo</h5><p>O que se aprende ao medir no downstream alimenta o próximo upstream.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DISCOVERY E DESIGN ===================== -->
+<section class="section" id="discovery" data-title="Do problema à solução">
+  <div class="eyebrow">05 · Descoberta</div>
+  <h1 class="title">Do problema à <em>solução</em></h1>
+  <p class="lede">Discovery e design caminham juntos. Primeiro entender e escolher o problema certo, depois criar e validar a solução certa, divergindo e convergindo duas vezes.</p>
+
+  <div class="block">
+    <div class="block-head"><h2>Double Diamond</h2><span>Divergir e convergir duas vezes</span></div>
+    <div class="grid" style="grid-template-columns:1fr 1fr;margin-bottom:8px">
+      <div class="kicker" style="text-align:center;margin:0">Espaço do problema</div>
+      <div class="kicker" style="text-align:center;margin:0">Espaço da solução</div>
+    </div>
+    <svg class="diamond" viewBox="0 0 800 140" aria-hidden="true">
+      <polygon points="10,70 200,10 390,70 200,130" fill="rgba(155,127,212,0.08)" stroke="#9B7FD4" stroke-width="1"/>
+      <polygon points="410,70 600,10 790,70 600,130" fill="none" stroke="#9B7FD4" stroke-width="1" stroke-dasharray="4 4"/>
+      <line x1="200" y1="10" x2="200" y2="130" stroke="#3a3456" stroke-width="1"/>
+      <line x1="600" y1="10" x2="600" y2="130" stroke="#3a3456" stroke-width="1"/>
+      <text x="400" y="76" text-anchor="middle" fill="#D4C4F0" font-family="Cormorant Garamond, serif" font-style="italic" font-size="18">→</text>
+    </svg>
+    <div class="grid g4">
+      <div class="phase"><div class="mode">Divergir</div><h5>Descobrir</h5><p>Pesquisar amplamente o contexto, as pessoas e o problema.</p></div>
+      <div class="phase"><div class="mode">Convergir</div><h5>Definir</h5><p>Sintetizar os achados e escolher o problema certo a resolver.</p></div>
+      <div class="phase"><div class="mode">Divergir</div><h5>Desenvolver</h5><p>Gerar várias soluções possíveis, prototipar e testar.</p></div>
+      <div class="phase"><div class="mode">Convergir</div><h5>Entregar</h5><p>Refinar a solução validada e preparar a passagem para o downstream.</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Os quatro riscos</h2><span>O que este processo reduz</span></div>
+    <div class="grid g4">
+      <div class="card hl"><div class="kicker">Valor</div><h4>Vão querer?</h4><p>As pessoas vão usar ou comprar a solução?</p></div>
+      <div class="card hl"><div class="kicker">Usabilidade</div><h4>Vão conseguir?</h4><p>Conseguem entender e usar sem ajuda?</p></div>
+      <div class="card hl"><div class="kicker">Viabilidade técnica</div><h4>Conseguimos construir?</h4><p>Com a tecnologia, o tempo e as pessoas que temos?</p></div>
+      <div class="card hl"><div class="kicker">Viabilidade de negócio</div><h4>Faz sentido?</h4><p>Funciona para o negócio: custo, legislação, operação, marca?</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Diamante 1 · O problema certo</h2><span>Descobrir → Definir</span></div>
+    <div class="grid g2" style="margin-bottom:16px">
+      <div class="card">
+        <div class="kicker">Entender o problema</div>
+        <span class="tag muted">Entrevistas em profundidade</span><span class="tag muted">Observação em contexto</span><span class="tag muted">Análise de dados de uso</span><span class="tag muted">Análise de feedback e suporte</span><span class="tag muted">Jobs to be Done</span>
+      </div>
+      <div class="card">
+        <div class="kicker">Sintetizar e escolher a oportunidade</div>
+        <span class="tag muted">Personas</span><span class="tag muted">Mapa de jornada</span><span class="tag muted">Opportunity Solution Tree</span><span class="tag muted">Mapeamento de suposições</span>
+      </div>
+    </div>
+    <div class="card side">
+      <div class="kicker">Saída do diamante 1 · A hipótese</div>
+      <p class="template"><b>Acreditamos que</b> <em>[solução]</em> <b>para</b> <em>[público]</em> <b>vai resultar em</b> <em>[mudança esperada]</em>. <b>Saberemos que funcionou quando</b> <em>[métrica]</em> <b>passar de</b> <em>[baseline]</em> <b>para</b> <em>[meta]</em>.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Diamante 2 · A solução certa</h2><span>Desenvolver → Entregar</span></div>
+    <p class="block-intro">Use a fidelidade proporcional à pergunta que você quer responder.</p>
+    <div class="grid g4" style="margin-bottom:24px">
+      <div class="phase"><div class="mode">Minutos</div><h5>Esboço</h5><p>Explorar muitas ideias rapidamente.</p></div>
+      <div class="phase"><div class="mode">Horas</div><h5>Wireframe</h5><p>Estrutura, hierarquia e fluxo.</p></div>
+      <div class="phase"><div class="mode">Dias</div><h5>Protótipo navegável</h5><p>Testar o fluxo com usuários.</p></div>
+      <div class="phase"><div class="mode">Dias a semanas</div><h5>Alta fidelidade</h5><p>Validar detalhes visuais e preparar o handoff.</p></div>
+    </div>
+    <div class="grid g3">
+      <div class="card hl"><div class="kicker">Testes de usabilidade</div><h4>Encontrar problemas reais</h4>
+        <ul class="list"><li>Definir tarefas críticas e critérios de sucesso</li><li>5 a 8 participantes por rodada revelam a maioria dos problemas</li><li>Medir sucesso, tempo e erros e registrar as sessões</li></ul></div>
+      <div class="card hl"><div class="kicker">Outras validações</div><h4>Testar antes de construir</h4>
+        <span class="tag muted">Card sorting</span><span class="tag muted">Fake door</span><span class="tag muted">Concierge / Mágico de Oz</span><span class="tag muted">Teste A/B</span></div>
+      <div class="card hl"><div class="kicker">Handoff</div><h4>Passagem para o desenvolvimento</h4>
+        <ul class="list check"><li>Estados: vazio, carregando, erro e sucesso</li><li>Casos de borda e conteúdos extremos</li><li>Comportamento responsivo e interações</li><li>Textos finais e requisitos de acessibilidade</li></ul></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>O que sustenta a qualidade</h2><span>Em todo o processo</span></div>
+    <div class="grid g3">
+      <div class="card side"><div class="kicker">Design System</div>
+        <ul class="list"><li>Tokens de design: cores, tipografia, espaçamento</li><li>Biblioteca de componentes no design e no código</li><li>Documentação com exemplos de uso</li><li>Governança: como contribuir e versionar</li></ul></div>
+      <div class="card side"><div class="kicker">Acessibilidade</div>
+        <ul class="list"><li>Referência: WCAG nível AA</li><li>Contraste mínimo de 4,5:1 para texto</li><li>Navegação completa por teclado</li><li>Textos alternativos e não depender só de cor</li></ul></div>
+      <div class="card side"><div class="kicker">Métricas de UX</div>
+        <ul class="list"><li>Taxa de sucesso na tarefa</li><li>Tempo na tarefa e taxa de erro</li><li>SUS (System Usability Scale)</li><li>Satisfação e esforço percebido</li></ul></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Exemplos</h2><span>Casos ilustrativos</span></div>
+    <div class="grid g3">
+      <div class="card case hl">
+        <h4>Plataforma de cursos online</h4>
+        <dl>
+          <div><dt>Sinal</dt><dd>A maioria dos alunos para de assistir na segunda aula.</dd></div>
+          <div><dt>Descoberta</dt><dd>Entrevistas mostram que muita gente estuda no transporte, e as aulas de 40 minutos não cabem nesse tempo.</dd></div>
+          <div><dt>Solução testada</dt><dd>Aulas em blocos de 10 minutos, com o progresso salvo automaticamente.</dd></div>
+          <div><dt>Aprendizado</dt><dd>O formato precisa caber no momento em que a pessoa usa o produto.</dd></div>
+        </dl>
+      </div>
+      <div class="card case hl">
+        <h4>App de receitas</h4>
+        <dl>
+          <div><dt>Sinal</dt><dd>Muitas receitas são salvas, mas poucas chegam a ser preparadas.</dd></div>
+          <div><dt>Descoberta</dt><dd>Na observação em casa, o obstáculo aparece na hora de cozinhar: sempre falta algum ingrediente.</dd></div>
+          <div><dt>Solução testada</dt><dd>Lista de compras gerada a partir da receita. Um fake door mediu o interesse antes de construir.</dd></div>
+          <div><dt>Aprendizado</dt><dd>Intenção alta não garante ação. É preciso remover o atrito do passo seguinte.</dd></div>
+        </dl>
+      </div>
+      <div class="card case hl">
+        <h4>App de aulas em estúdios</h4>
+        <dl>
+          <div><dt>Sinal</dt><dd>Muitas reservas de aula são canceladas em cima da hora.</dd></div>
+          <div><dt>Descoberta</dt><dd>As pessoas reservam várias aulas "para garantir a vaga", porque as turmas lotam rápido.</dd></div>
+          <div><dt>Solução testada</dt><dd>Lista de espera com aviso automático quando uma vaga abre, testada em protótipo.</dd></div>
+          <div><dt>Aprendizado</dt><dd>Um comportamento indesejado costuma ser uma resposta lógica a uma regra do próprio produto.</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="card">
+      <div class="kicker">Boas práticas</div>
+      <ul class="list">
+        <li><b style="color:var(--text)">Discovery contínuo:</b> contato frequente com usuários, não só no início de projetos.</li>
+        <li><b style="color:var(--text)">Trio de produto:</b> produto, design e tecnologia participam juntos dos dois diamantes.</li>
+        <li><b style="color:var(--text)">Registre aprendizados:</b> evidências, decisões e hipóteses descartadas ficam acessíveis ao time.</li>
+        <li><b style="color:var(--text)">Descartar cedo é sucesso:</b> uma ideia invalidada no protótipo economiza semanas de desenvolvimento.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ESTRUTURA ===================== -->
+<section class="section" id="estrutura" data-title="Estrutura do trabalho">
+  <div class="eyebrow">06 · Entrega</div>
+  <h1 class="title">Estrutura do <em>trabalho</em></h1>
+  <p class="lede">Uma hierarquia comum conecta a estratégia ao dia a dia do time. Os nomes variam entre ferramentas; o que importa é a relação entre os níveis.</p>
+
+  <div class="block">
+    <div class="block-head"><h2>Hierarquia</h2></div>
+    <div class="hier">
+      <div class="hier-row"><div><h5>Iniciativa</h5><p>Aposta estratégica ligada a um OKR, que agrupa vários épicos.</p></div><span class="hz">trimestre ou mais</span></div>
+      <div class="hier-row" style="margin-left:24px"><div><h5>Épico</h5><p>Entrega de valor relevante, quebrada em histórias.</p></div><span class="hz">semanas</span></div>
+      <div class="hier-row" style="margin-left:48px"><div><h5>História · Tarefa · Bug</h5><p>Unidade de trabalho que cabe em um ciclo.</p></div><span class="hz">dias</span></div>
+      <div class="hier-row" style="margin-left:72px"><div><h5>Subtarefa</h5><p>Passo técnico ou operacional de uma história.</p></div><span class="hz">horas</span></div>
+    </div>
+  </div>
+
+  <div class="block grid g2">
+    <div class="card side">
+      <div class="kicker">User story</div>
+      <p class="mono" style="color:var(--text);margin-bottom:12px">Como [persona], quero [ação], para [benefício]</p>
+      <p style="font-style:italic">Ex.: Como organizadora de eventos, quero exportar a lista de participantes, para enviar ao local do evento.</p>
+    </div>
+    <div class="card side">
+      <div class="kicker">Critérios de aceite</div>
+      <p class="mono" style="color:var(--text)">Dado [contexto]<br>Quando [ação]<br>Então [resultado esperado]</p>
+      <p style="font-style:italic;margin-top:12px">Ex.: Dado um evento com inscritos, quando eu clicar em exportar, então recebo um arquivo com nome e e-mail de cada participante.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>INVEST</h2><span>Uma boa história é…</span></div>
+    <div class="grid g6">
+      <div class="card letter-card"><div class="big">I</div><h5>Independente</h5><p>Pode ser entregue sem depender de outra.</p></div>
+      <div class="card letter-card"><div class="big">N</div><h5>Negociável</h5><p>Abre conversa, não é contrato fechado.</p></div>
+      <div class="card letter-card"><div class="big">V</div><h5>Valiosa</h5><p>Entrega valor perceptível.</p></div>
+      <div class="card letter-card"><div class="big">E</div><h5>Estimável</h5><p>O time entende o bastante para estimar.</p></div>
+      <div class="card letter-card"><div class="big">S</div><h5>Pequena</h5><p>Cabe confortavelmente em um ciclo.</p></div>
+      <div class="card letter-card"><div class="big">T</div><h5>Testável</h5><p>Tem critérios claros de aceite.</p></div>
+    </div>
+  </div>
+
+  <div class="block grid g3">
+    <div class="card"><div class="kicker">Definition of Ready</div><h4>Pode começar</h4>
+      <ul class="list check"><li>Valor e objetivo claros</li><li>Critérios de aceite definidos</li><li>Design disponível, se necessário</li><li>Dependências mapeadas</li><li>Estimada pelo time</li></ul></div>
+    <div class="card"><div class="kicker">Definition of Done</div><h4>Está pronta</h4>
+      <ul class="list check"><li>Critérios de aceite atendidos</li><li>Código revisado e testado</li><li>Sem bugs críticos abertos</li><li>Documentação atualizada</li><li>Disponível em produção ou pronta para lançar</li></ul></div>
+    <div class="card"><div class="kicker">Checklist do épico</div><h4>Antes de quebrar</h4>
+      <ul class="list check"><li>Problema e métrica de sucesso definidos</li><li>Fluxo mapeado e validado</li><li>Protótipo testado</li><li>Viabilidade técnica confirmada</li><li>Histórias criadas com critérios de aceite</li></ul></div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Visões recomendadas</h2></div>
+    <span class="tag">Estratégica · Iniciativas</span><span class="tag">Upstream · Discovery</span><span class="tag">Design</span><span class="tag">Downstream · Delivery</span><span class="tag">Sustentação · Bugs</span>
+  </div>
+</section>
+
+<!-- ===================== BACKLOG ===================== -->
+<section class="section" id="backlog" data-title="Backlog e refinamento">
+  <div class="eyebrow">07 · Entrega</div>
+  <h1 class="title">Backlog e <em>refinamento</em></h1>
+  <p class="lede">Uma lista viva e priorizada do que pode gerar valor. O backlog saudável é detalhado no topo e mais aberto na base.</p>
+
+  <div class="block">
+    <div class="block-head"><h2>O iceberg</h2></div>
+    <div class="iceberg">
+      <div class="ice i1"><h5>Próximos ciclos</h5><p>Histórias pequenas, refinadas e estimadas</p></div>
+      <div class="ice i2"><h5>Próximos meses</h5><p>Épicos priorizados, parcialmente refinados</p></div>
+      <div class="ice i3"><h5>Futuro</h5><p>Oportunidades e ideias, com pouco detalhe</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>DEEP</h2><span>Características de um bom backlog</span></div>
+    <div class="grid g4">
+      <div class="card letter-card"><div class="big">D</div><h5>Detalhado na medida</h5><p>Mais detalhe no que vem primeiro.</p></div>
+      <div class="card letter-card"><div class="big">E</div><h5>Estimado</h5><p>Itens do topo têm estimativa.</p></div>
+      <div class="card letter-card"><div class="big">E</div><h5>Emergente</h5><p>Muda conforme se aprende.</p></div>
+      <div class="card letter-card"><div class="big">P</div><h5>Priorizado</h5><p>A ordem reflete valor e risco.</p></div>
+    </div>
+  </div>
+
+  <div class="block grid g3">
+    <div class="card hl"><div class="kicker">Refinamento</div><h4>Preparar o que vem</h4>
+      <ul class="list"><li>Contínuo, não só às vésperas do planejamento</li><li>Referência comum: até ~10% da capacidade do time</li><li>Foco nos itens dos próximos 1 a 2 ciclos</li></ul></div>
+    <div class="card hl"><div class="kicker">Higiene</div><h4>Manter enxuto</h4>
+      <ul class="list"><li>Revisar itens parados há muito tempo</li><li>Arquivar o que perdeu relevância</li><li>Agrupar duplicados e itens parecidos</li></ul></div>
+    <div class="card hl"><div class="kicker">Fluxo</div><h4>Limitar WIP</h4>
+      <ul class="list"><li>Menos itens em paralelo, entregas mais rápidas</li><li>Terminar antes de começar algo novo</li><li>Tornar gargalos visíveis no quadro</li></ul></div>
+  </div>
+</section>
+
+<!-- ===================== ESTIMATIVAS ===================== -->
+<section class="section" id="estimativas" data-title="Estimativas">
+  <div class="eyebrow">08 · Entrega</div>
+  <h1 class="title">Estimativas <em>colaborativas</em></h1>
+  <p class="lede">Estimativas relativas medem o esforço considerando complexidade, risco e incerteza. Servem para planejar e para gerar conversa, não para cobrar prazos.</p>
+
+  <div class="block grid g2">
+    <div class="card">
+      <div class="kicker">Story points · Fibonacci</div>
+      <div class="fib"><span class="lo">0</span><span class="lo">1</span><span class="lo">2</span><span class="lo">3</span><span>5</span><span>8</span><span class="hi">13</span><span class="hi">20</span><span class="hi">40</span></div>
+      <p>Os intervalos crescem com o tamanho porque a incerteza também cresce. Itens grandes demais devem ser divididos.</p>
+    </div>
+    <div class="card side spidr">
+      <div class="kicker">SPIDR · Como dividir histórias</div>
+      <p><b>S</b>pikes: investigar antes para reduzir a incerteza</p>
+      <p><b>P</b>aths: um caminho alternativo do fluxo por vez</p>
+      <p><b>I</b>nterfaces: um canal, dispositivo ou integração por vez</p>
+      <p><b>D</b>ata: um tipo ou subconjunto de dados por vez</p>
+      <p><b>R</b>ules: uma regra de negócio por vez</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Alternativas</h2></div>
+    <div class="grid g3">
+      <div class="card hl"><div class="kicker">T-shirt sizing</div><h4>PP · P · M · G · GG</h4><p>Bom para épicos e roadmap, quando não é preciso precisão.</p></div>
+      <div class="card hl"><div class="kicker">Previsão por throughput</div><h4>Usar o histórico</h4><p>Conta quantos itens o time entrega por semana e projeta cenários com base nisso.</p></div>
+      <div class="card hl"><div class="kicker">Fatiamento uniforme</div><h4>Itens de tamanho parecido</h4><p>Dividir tudo em partes pequenas e semelhantes e contar itens em vez de pontos.</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="card">
+      <div class="kicker">Boas práticas</div>
+      <ul class="list">
+        <li>Defina histórias-âncora para calibrar o que significa cada tamanho</li>
+        <li>Quem executa é quem estima</li>
+        <li>Não converta pontos em horas</li>
+        <li>Não compare velocidade entre times: cada um tem sua própria escala</li>
+        <li>Sessões curtas. Se demorar, a história precisa de mais refinamento</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== RITUAIS ===================== -->
+<section class="section" id="rituais" data-title="Rituais">
+  <div class="eyebrow">09 · Entrega</div>
+  <h1 class="title">Rituais e <em>cerimônias</em></h1>
+  <p class="lede">Encontros com propósito claro criam cadência e transparência. Se um ritual não gera decisão nem aprendizado, mude o formato.</p>
+
+  <div class="block">
+    <div class="block-head"><h2>Cadência</h2><span>Referência para ciclos de 2 semanas</span></div>
+    <div class="cadence">
+      <div class="cad"><div class="freq">Diário</div><p>Daily</p></div>
+      <div class="cad"><div class="freq">Semanal</div><p>Refinamento · check-in de métricas</p></div>
+      <div class="cad"><div class="freq">Por ciclo</div><p>Planning · Review · Retrospectiva</p></div>
+      <div class="cad"><div class="freq">Mensal a trimestral</div><p>Revisão de OKRs e roadmap</p></div>
+    </div>
+  </div>
+
+  <div class="block grid g3">
+    <div class="card hl">
+      <div class="cer-head"><h4>Daily</h4><span class="dur">~15 min</span></div>
+      <p class="cer-freq">Diária</p>
+      <ul class="list"><li>Como estamos em relação à meta do ciclo?</li><li>O que vamos fazer hoje?</li><li>Há algum impedimento?</li></ul>
+      <p class="tip">Para coordenar o trabalho, não para reportar status.</p>
+    </div>
+    <div class="card hl">
+      <div class="cer-head"><h4>Planning</h4><span class="dur">1–2 h</span></div>
+      <p class="cer-freq">Início do ciclo</p>
+      <ul class="list"><li>Qual é a meta do ciclo?</li><li>Qual a capacidade real do time?</li><li>Quais itens entram?</li></ul>
+      <p class="tip">Comece pela meta, não pela lista de tarefas.</p>
+    </div>
+    <div class="card hl">
+      <div class="cer-head"><h4>Refinamento</h4><span class="dur">~1 h</span></div>
+      <p class="cer-freq">Semanal</p>
+      <ul class="list"><li>O problema e o escopo estão claros?</li><li>Os critérios de aceite estão completos?</li><li>Precisa dividir?</li></ul>
+      <p class="tip">Prepare os próximos ciclos com antecedência.</p>
+    </div>
+    <div class="card hl">
+      <div class="cer-head"><h4>Review</h4><span class="dur">30–60 min</span></div>
+      <p class="cer-freq">Fim do ciclo</p>
+      <ul class="list"><li>O que foi entregue?</li><li>Demonstração funcionando</li><li>Feedback de stakeholders</li></ul>
+      <p class="tip">Mostre valor e resultado, não tarefas.</p>
+    </div>
+    <div class="card hl">
+      <div class="cer-head"><h4>Retrospectiva</h4><span class="dur">45–90 min</span></div>
+      <p class="cer-freq">Fim do ciclo</p>
+      <ul class="list"><li>O que funcionou?</li><li>O que podemos melhorar?</li><li>Qual ação concreta vamos testar?</li></ul>
+      <p class="tip">Ambiente seguro, poucas ações e com dono.</p>
+    </div>
+    <div class="card hl">
+      <div class="cer-head"><h4>Revisão estratégica</h4><span class="dur">1–2 h</span></div>
+      <p class="cer-freq">Mensal ou trimestral</p>
+      <ul class="list"><li>Como estão os OKRs?</li><li>O roadmap ainda faz sentido?</li><li>Que bloqueios precisam da liderança?</li></ul>
+      <p class="tip">Conecta o dia a dia à estratégia.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Formatos de retrospectiva</h2><span>Varie para manter o engajamento</span></div>
+    <div class="grid g4">
+      <div class="card plain"><h5>Start · Stop · Continue</h5><p>O que começar, parar e manter.</p></div>
+      <div class="card plain"><h5>4Ls</h5><p>Liked, Learned, Lacked, Longed for.</p></div>
+      <div class="card plain"><h5>Barco à vela</h5><p>Vento (impulsos), âncoras (freios), rochas (riscos) e ilha (meta).</p></div>
+      <div class="card plain"><h5>Linha do tempo</h5><p>Reconstruir o ciclo e marcar altos e baixos.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== RESULTADOS ===================== -->
+<section class="section" id="resultados" data-title="Medir resultados">
+  <div class="eyebrow">10 · Aprendizado</div>
+  <h1 class="title">Medir <em>resultados</em></h1>
+  <p class="lede">Entregar não é o fim. Medir o impacto fecha o ciclo e informa a próxima decisão.</p>
+
+  <div class="quote">Se não definimos antes como medir o sucesso, qualquer resultado depois parece suficiente.</div>
+
+  <div class="block">
+    <div class="block-head"><h2>Antes de entregar, defina</h2></div>
+    <div class="def-row">
+      <div><b>Métrica</b><span>O que vai mudar</span></div>
+      <div><b>Baseline</b><span>Valor atual</span></div>
+      <div><b>Meta</b><span>Valor esperado</span></div>
+      <div><b>Prazo</b><span>Quando medir</span></div>
+      <div><b>Fonte</b><span>De onde vem o dado</span></div>
+      <div><b>Dono</b><span>Quem acompanha</span></div>
+    </div>
+  </div>
+
+  <div class="block grid g2">
+    <div class="card hl">
+      <div class="kicker">North Star Metric</div>
+      <h4>Uma métrica que captura o valor entregue</h4>
+      <p>Indica se o produto está gerando valor para o cliente de forma sustentável. É sustentada por métricas de entrada que os times conseguem influenciar.</p>
+      <div class="when"><b>Exemplos</b>Streaming: horas assistidas · Marketplace: transações concluídas · Ferramenta colaborativa: times ativos por semana</div>
+    </div>
+    <div class="card hl">
+      <div class="kicker">Indicadores</div>
+      <h4>Antecedentes e consequentes</h4>
+      <p><b style="color:var(--text)">Leading (antecedentes):</b> mudam rápido e preveem o resultado. Ex.: ativação na primeira semana.</p>
+      <p><b style="color:var(--text)">Lagging (consequentes):</b> confirmam o resultado, mas demoram a aparecer. Ex.: retenção anual, receita.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>HEART</h2><span>Métricas centradas no usuário</span></div>
+    <div class="grid g5">
+      <div class="card letter-card"><div class="big">H</div><h5>Happiness</h5><p>Satisfação e percepção</p><p class="ex">NPS, CSAT</p></div>
+      <div class="card letter-card"><div class="big">E</div><h5>Engagement</h5><p>Intensidade de uso</p><p class="ex">Sessões por semana</p></div>
+      <div class="card letter-card"><div class="big">A</div><h5>Adoption</h5><p>Novos usuários de algo</p><p class="ex">% que usou o recurso</p></div>
+      <div class="card letter-card"><div class="big">R</div><h5>Retention</h5><p>Quem volta</p><p class="ex">Retenção D30</p></div>
+      <div class="card letter-card"><div class="big">T</div><h5>Task success</h5><p>Eficiência e eficácia</p><p class="ex">Taxa de conclusão</p></div>
+    </div>
+    <p class="block-intro" style="margin-top:14px">Para cada dimensão: <b style="color:var(--text)">Objetivo</b> → <b style="color:var(--text)">Sinal</b> que indica avanço → <b style="color:var(--text)">Métrica</b> que mede o sinal.</p>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>AARRR</h2><span>Funil do ciclo de vida</span></div>
+    <div class="grid g5">
+      <div class="phase"><div class="mode">01</div><h5>Aquisição</h5><p>Como as pessoas chegam</p></div>
+      <div class="phase"><div class="mode">02</div><h5>Ativação</h5><p>Primeira experiência de valor</p></div>
+      <div class="phase"><div class="mode">03</div><h5>Retenção</h5><p>Voltam a usar</p></div>
+      <div class="phase"><div class="mode">04</div><h5>Receita</h5><p>Geram valor para o negócio</p></div>
+      <div class="phase"><div class="mode">05</div><h5>Indicação</h5><p>Recomendam para outras pessoas</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Métricas de fluxo</h2><span>Saúde da entrega</span></div>
+    <div class="grid g4">
+      <div class="card"><div class="kicker">Lead time</div><p>Do pedido até a entrega. É o tempo que o cliente percebe.</p></div>
+      <div class="card"><div class="kicker">Cycle time</div><p>Do início do trabalho até a conclusão.</p></div>
+      <div class="card"><div class="kicker">Throughput</div><p>Itens concluídos por período.</p></div>
+      <div class="card"><div class="kicker">WIP</div><p>Itens em andamento ao mesmo tempo.</p></div>
+    </div>
+  </div>
+
+  <div class="block grid g2">
+    <div class="card">
+      <div class="kicker">Rotina de acompanhamento</div>
+      <div class="steps">
+        <div class="step"><span class="step-n">S</span><div><h5>Semanal</h5><p>Métricas do time e check-in dos KRs.</p></div></div>
+        <div class="step"><span class="step-n">M</span><div><h5>Mensal</h5><p>Tendências, aprendizados e ajuste de iniciativas.</p></div></div>
+        <div class="step"><span class="step-n">T</span><div><h5>Trimestral</h5><p>Fechamento de OKRs e revisão da estratégia.</p></div></div>
+      </div>
+    </div>
+    <div class="card" style="border-left:1px solid var(--bad)">
+      <div class="kicker" style="color:var(--bad)">Antipadrões</div>
+      <ul class="list">
+        <li>Métricas de vaidade, que só crescem e não orientam decisões</li>
+        <li>Medir só output: funcionalidades, tarefas, pontos</li>
+        <li>Métricas sem dono e sem rotina de leitura</li>
+        <li>Medir tudo e não agir sobre nada</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== GLOSSÁRIO ===================== -->
+<section class="section" id="glossario" data-title="Glossário">
+  <div class="eyebrow">11 · Referência</div>
+  <h1 class="title">Glossário de <em>termos</em></h1>
+  <p class="lede">Uma linguagem comum entre produto, design, tecnologia e negócio.</p>
+
+  <div class="gloss-filter"><input type="search" id="glossFilter" placeholder="Filtrar termos…" aria-label="Filtrar termos"></div>
+  <div class="gloss-grid" id="glossGrid">
+    <div class="term"><h5>Ágil</h5><p>Abordagem iterativa, com entregas incrementais e adaptação contínua a partir de feedback.</p></div>
+    <div class="term"><h5>Backlog</h5><p>Lista ordenada e viva de itens que podem gerar valor para o produto.</p></div>
+    <div class="term"><h5>Baseline</h5><p>Valor atual de uma métrica, ponto de partida para medir a evolução.</p></div>
+    <div class="term"><h5>Critérios de aceite</h5><p>Condições que definem quando uma história atende ao esperado.</p></div>
+    <div class="term"><h5>Cycle time</h5><p>Tempo entre o início do trabalho em um item e sua conclusão.</p></div>
+    <div class="term"><h5>Definition of Done</h5><p>Acordo do time sobre o que significa um item estar pronto.</p></div>
+    <div class="term"><h5>Definition of Ready</h5><p>Acordo sobre o que um item precisa ter para começar a ser desenvolvido.</p></div>
+    <div class="term"><h5>Discovery</h5><p>Investigação para entender problemas e validar soluções antes de construir.</p></div>
+    <div class="term"><h5>Downstream</h5><p>Trilha de execução: detalhamento, desenvolvimento, testes e entrega.</p></div>
+    <div class="term"><h5>Épico</h5><p>Entrega de valor relevante, dividida em histórias menores.</p></div>
+    <div class="term"><h5>Hipótese</h5><p>Suposição explícita e testável sobre o efeito de uma solução.</p></div>
+    <div class="term"><h5>Iniciativa</h5><p>Aposta estratégica ligada a um objetivo, que agrupa épicos.</p></div>
+    <div class="term"><h5>Key Result</h5><p>Resultado mensurável que indica o avanço em direção a um objetivo.</p></div>
+    <div class="term"><h5>Lead time</h5><p>Tempo entre o pedido de um item e sua entrega ao cliente.</p></div>
+    <div class="term"><h5>MVP</h5><p>Menor versão de uma solução capaz de gerar aprendizado validado.</p></div>
+    <div class="term"><h5>North Star Metric</h5><p>Métrica principal que representa o valor entregue ao cliente.</p></div>
+    <div class="term"><h5>Objetivo</h5><p>Descrição qualitativa e inspiradora do que se quer alcançar.</p></div>
+    <div class="term"><h5>Outcome</h5><p>Mudança de comportamento ou de métrica gerada por uma entrega.</p></div>
+    <div class="term"><h5>Output</h5><p>O que foi produzido: funcionalidades, telas, documentos.</p></div>
+    <div class="term"><h5>Refinamento</h5><p>Atividade contínua de esclarecer, dividir e estimar itens do backlog.</p></div>
+    <div class="term"><h5>Roadmap</h5><p>Comunicação da direção do produto ao longo do tempo.</p></div>
+    <div class="term"><h5>Sprint</h5><p>Ciclo de trabalho com duração fixa, geralmente de 1 a 4 semanas.</p></div>
+    <div class="term"><h5>Story points</h5><p>Medida relativa de esforço, complexidade e incerteza.</p></div>
+    <div class="term"><h5>Throughput</h5><p>Quantidade de itens concluídos em um período.</p></div>
+    <div class="term"><h5>Trio de produto</h5><p>Produto, design e tecnologia trabalhando juntos no discovery.</p></div>
+    <div class="term"><h5>Upstream</h5><p>Trilha de concepção: exploração, discovery e validação.</p></div>
+    <div class="term"><h5>User story</h5><p>Descrição curta de uma necessidade, do ponto de vista de quem usa.</p></div>
+    <div class="term"><h5>UX · UI</h5><p>Experiência do usuário (comportamento e jornada) e interface (camada visual).</p></div>
+    <div class="term"><h5>Velocidade</h5><p>Média de pontos concluídos por ciclo, usada só pelo próprio time.</p></div>
+    <div class="term"><h5>WIP</h5><p>Work in progress: itens em andamento ao mesmo tempo.</p></div>
+  </div>
+  <p class="gloss-empty" id="glossEmpty">Nenhum termo encontrado.</p>
+</section>
+
+</template>
+<template id="tpl-nav-en">  <div class="nav-home">
+    <a class="nav-item" href="./"><span class="nav-num">←</span>Creations portal</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Overview</div>
+    <button class="nav-item" data-go="inicio"><span class="nav-num">—</span>Home</button>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Strategy</div>
+    <button class="nav-item" data-go="okrs"><span class="nav-num">01</span>OKRs</button>
+    <button class="nav-item" data-go="roadmap"><span class="nav-num">02</span>Roadmap</button>
+    <button class="nav-item" data-go="priorizacao"><span class="nav-num">03</span>Prioritization</button>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Discovery</div>
+    <button class="nav-item" data-go="upstream"><span class="nav-num">04</span>Upstream and Downstream</button>
+    <button class="nav-item" data-go="discovery"><span class="nav-num">05</span>From problem to solution</button>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Delivery</div>
+    <button class="nav-item" data-go="estrutura"><span class="nav-num">06</span>Work structure</button>
+    <button class="nav-item" data-go="backlog"><span class="nav-num">07</span>Backlog and refinement</button>
+    <button class="nav-item" data-go="estimativas"><span class="nav-num">08</span>Estimation</button>
+    <button class="nav-item" data-go="rituais"><span class="nav-num">09</span>Rituals</button>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Learning</div>
+    <button class="nav-item" data-go="resultados"><span class="nav-num">10</span>Measuring outcomes</button>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Reference</div>
+    <button class="nav-item" data-go="glossario"><span class="nav-num">11</span>Glossary</button>
+  </div>
+</template>
+<template id="tpl-main-en">
+<!-- ===================== HOME ===================== -->
+<section class="section" id="inicio" data-title="Home">
+  <div class="eyebrow">Product Ops · Framework</div>
+  <h1 class="title display">Product practices <em>guide</em></h1>
+  <p class="lede">Good practices that help product, design and engineering teams speak the same language, from strategy to measuring outcomes.</p>
+
+  <div class="block">
+    <div class="block-head"><h2>The product cycle</h2><span>How this guide is organized</span></div>
+    <div class="grid g4">
+      <div class="card stage">
+        <div class="stage-n">01</div>
+        <h4>Strategy</h4>
+        <p class="q">Where are we going, and why?</p>
+        <div class="stage-links">
+          <button class="link-btn" data-go="okrs">OKRs</button>
+          <button class="link-btn" data-go="roadmap">Roadmap</button>
+          <button class="link-btn" data-go="priorizacao">Prioritization</button>
+        </div>
+      </div>
+      <div class="card stage">
+        <div class="stage-n">02</div>
+        <h4>Discovery</h4>
+        <p class="q">Which problem is worth solving?</p>
+        <div class="stage-links">
+          <button class="link-btn" data-go="upstream">Upstream and Downstream</button>
+          <button class="link-btn" data-go="discovery">From problem to solution</button>
+        </div>
+      </div>
+      <div class="card stage">
+        <div class="stage-n">03</div>
+        <h4>Delivery</h4>
+        <p class="q">How do we build it well?</p>
+        <div class="stage-links">
+          <button class="link-btn" data-go="estrutura">Work structure</button>
+          <button class="link-btn" data-go="backlog">Backlog</button>
+          <button class="link-btn" data-go="estimativas">Estimation</button>
+          <button class="link-btn" data-go="rituais">Rituals</button>
+        </div>
+      </div>
+      <div class="card stage">
+        <div class="stage-n">04</div>
+        <h4>Learning</h4>
+        <p class="q">What actually changed?</p>
+        <div class="stage-links">
+          <button class="link-btn" data-go="resultados">Measuring outcomes</button>
+          <button class="link-btn" data-go="glossario">Glossary</button>
+        </div>
+      </div>
+    </div>
+    <p class="loop-note">What we learn feeds the next strategy.</p>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Principles</h2><span>What guides every practice</span></div>
+    <div class="grid g3">
+      <div class="card hl"><div class="kicker">01</div><h4>Outcomes over output</h4><p>Success means changing a behavior or a metric that matters, not shipping more features.</p></div>
+      <div class="card hl"><div class="kicker">02</div><h4>Problem before solution</h4><p>Understand the cause before investing in building. The cheapest idea is the one we drop early.</p></div>
+      <div class="card hl"><div class="kicker">03</div><h4>Explicit decisions</h4><p>Prioritization criteria, trade-offs and commitments are visible to everyone involved.</p></div>
+      <div class="card hl"><div class="kicker">04</div><h4>Sustainable cadence</h4><p>Short rituals with a clear purpose, at a pace the team can keep over time.</p></div>
+      <div class="card hl"><div class="kicker">05</div><h4>Process is a product too</h4><p>Practices are hypotheses: measure, review and adjust them when they stop adding value.</p></div>
+      <div class="card hl"><div class="kicker">06</div><h4>Shared language</h4><p>Standard terms and artifacts reduce noise between product, design, engineering and business.</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>How to use it</h2></div>
+    <div class="card plain">
+      <ul class="list">
+        <li>Browse by topic. Each section stands on its own.</li>
+        <li>Adapt it to your context: team size, maturity and type of product change what makes sense to apply.</li>
+        <li>Use it as a base for onboarding new people and for working agreements between teams.</li>
+        <li>Press <span class="tag muted" style="margin:0 2px">/</span> to search for any term.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== OKRs ===================== -->
+<section class="section" id="okrs" data-title="OKRs">
+  <div class="eyebrow">01 · Strategy</div>
+  <h1 class="title">Managing <em>OKRs</em></h1>
+  <p class="lede">Objectives and Key Results connect strategy to measurable outcomes. They give the team focus and leave it free to choose how to get there.</p>
+
+  <div class="block">
+    <div class="block-head"><h2>Anatomy</h2></div>
+    <div class="grid g3">
+      <div class="card hl"><div class="kicker">What</div><h4>Objective</h4><p>Qualitative, inspiring and time-bound. Answers "what do we want to achieve?".</p></div>
+      <div class="card hl"><div class="kicker">How we'll know</div><h4>Key Results</h4><p>3 to 5 per objective. Quantitative, with a baseline and a target, measuring outcomes rather than tasks.</p></div>
+      <div class="card hl"><div class="kicker">What we'll try</div><h4>Initiatives</h4><p>Bets we believe will move the KRs. They can change during the cycle without changing the OKR.</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Outcome, not output</h2><span>The most common mistake</span></div>
+    <div class="card">
+      <div class="compare">
+        <div class="from"><span class="lbl">✗ KR as output</span>Launch the new sign-up flow by March</div>
+        <div class="arrow">→</div>
+        <div class="to"><span class="lbl">✓ KR as outcome</span>Increase sign-up completion from 40% to 60% by March</div>
+      </div>
+      <div class="compare">
+        <div class="from"><span class="lbl">✗ KR as activity</span>Run 10 customer interviews</div>
+        <div class="arrow">→</div>
+        <div class="to"><span class="lbl">✓ KR as outcome</span>Reduce first-month cancellations from 25% to 15%</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block grid g2">
+    <div class="card">
+      <div class="kicker">Cycle</div>
+      <div class="steps">
+        <div class="step"><span class="step-n">01</span><div><h5>Set objectives</h5><p>Leadership direction combined with proposals from the teams.</p></div></div>
+        <div class="step"><span class="step-n">02</span><div><h5>Write the KRs</h5><p>Each KR with a metric, baseline, target and data source.</p></div></div>
+        <div class="step"><span class="step-n">03</span><div><h5>Assign owners</h5><p>One person responsible for tracking each KR.</p></div></div>
+        <div class="step"><span class="step-n">04</span><div><h5>Track</h5><p>Weekly check-in on progress and confidence in the target.</p></div></div>
+        <div class="step"><span class="step-n">05</span><div><h5>Review and learn</h5><p>At the end of the cycle, assess what worked and carry it into the next one.</p></div></div>
+      </div>
+    </div>
+    <div class="grid" style="align-content:start">
+      <div class="card side">
+        <div class="kicker">Example · Online learning platform</div>
+        <h4>Help students finish what they start</h4>
+        <p><b style="color:var(--accent-2)">KR1</b> Course completion from 12% to 25%</p>
+        <p><b style="color:var(--accent-2)">KR2</b> Students active in week 2 from 40% to 55%</p>
+        <p><b style="color:var(--accent-2)">KR3</b> Average lesson rating from 4.1 to 4.5</p>
+      </div>
+      <div class="card side">
+        <div class="kicker">Example · Recipe app</div>
+        <h4>Make the app part of the kitchen routine</h4>
+        <p><b style="color:var(--accent-2)">KR1</b> Recipes cooked per active user from 1.2 to 2 per month</p>
+        <p><b style="color:var(--accent-2)">KR2</b> D30 retention from 18% to 25%</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="block grid g2">
+    <div class="card">
+      <div class="kicker">Good practices</div>
+      <ul class="list">
+        <li>Few objectives per cycle. Focus beats coverage.</li>
+        <li>Separate committed OKRs (must be met) from aspirational ones (reaching ~70% is already a good result).</li>
+        <li>Revisit initiatives whenever data shows they aren't moving the KR.</li>
+        <li>Keep OKRs public to all teams.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="kicker">Avoid</div>
+      <ul class="list">
+        <li>KRs that are task or delivery lists</li>
+        <li>KRs without a baseline, which make progress impossible to measure</li>
+        <li>Tying OKRs to individual performance reviews, which discourages ambitious goals</li>
+        <li>Setting them at the start and only looking again at the end of the cycle</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Roles</h2></div>
+    <div class="grid g4">
+      <div class="card plain"><h5>Leadership</h5><p>Sets the direction and the top-level objectives.</p></div>
+      <div class="card plain"><h5>Product Manager</h5><p>Translates direction into team OKRs and runs the tracking.</p></div>
+      <div class="card plain"><h5>Team</h5><p>Proposes initiatives and owns how to reach the outcomes.</p></div>
+      <div class="card plain"><h5>Stakeholders</h5><p>Align expectations and follow progress.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ROADMAP ===================== -->
+<section class="section" id="roadmap" data-title="Roadmap">
+  <div class="eyebrow">02 · Strategy</div>
+  <h1 class="title">Strategic <em>roadmap</em></h1>
+  <p class="lede">Communicates the product's direction over time. It is an alignment tool, not a list of promises with dates.</p>
+
+  <div class="block">
+    <div class="block-head"><h2>Formats</h2><span>Choose by level of uncertainty</span></div>
+    <div class="grid g3">
+      <div class="card hl">
+        <div class="kicker">By horizon</div>
+        <h4>Now · Next · Later</h4>
+        <p>Organized by time horizon, without dates. "Now" is in progress, "Next" is validated and prioritized, "Later" holds bets and opportunities.</p>
+        <div class="when"><b>When to use</b>Products with high uncertainty and teams that need flexibility to react to what they learn.</div>
+      </div>
+      <div class="card hl">
+        <div class="kicker">By outcome</div>
+        <h4>Outcome-based</h4>
+        <p>Organized by problems to solve or metrics to move, linked to OKRs. Solutions appear as hypotheses, not commitments.</p>
+        <div class="when"><b>When to use</b>To align leadership around impact and give teams autonomy to find solutions.</div>
+      </div>
+      <div class="card hl">
+        <div class="kicker">By date</div>
+        <h4>Timeline</h4>
+        <p>Organizes deliveries and milestones on a calendar. Makes dependencies and deadlines visible.</p>
+        <div class="when"><b>When to use</b>When there are real external dates: regulatory obligations, coordinated launches, contracts.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Confidence horizons</h2></div>
+    <p class="block-intro">The further out, the less detail and commitment. Communicate this explicitly.</p>
+    <div class="grid g3">
+      <div class="horizon" style="background:var(--accent-soft);border-color:var(--accent-line)"><div class="range">1 to 3 months</div><h4>Now</h4><p>Items in progress or ready to start, with a defined scope.</p><div class="conf"><i class="on"></i><i class="on"></i><i class="on"></i></div></div>
+      <div class="horizon"><div class="range">3 to 6 months</div><h4>Next</h4><p>Prioritized problems, in discovery or with a solution being validated.</p><div class="conf"><i class="on"></i><i class="on"></i><i></i></div></div>
+      <div class="horizon" style="border-style:dashed"><div class="range">6+ months</div><h4>Later</h4><p>Strategic direction, opportunities and big bets.</p><div class="conf"><i class="on"></i><i></i><i></i></div></div>
+    </div>
+  </div>
+
+  <div class="block grid g2">
+    <div class="card">
+      <div class="kicker">How it works</div>
+      <div class="steps">
+        <div class="step"><span class="step-n">01</span><div><h5>Gather inputs</h5><p>Strategy, OKRs, usage data, research and stakeholder requests.</p></div></div>
+        <div class="step"><span class="step-n">02</span><div><h5>Prioritize</h5><p>With explicit criteria. See the <button class="go" data-go="priorizacao" style="color:var(--accent-2);border-bottom:1px solid var(--accent-line)">Prioritization</button> section.</p></div></div>
+        <div class="step"><span class="step-n">03</span><div><h5>Communicate by audience</h5><p>The same roadmap, with different levels of detail for each audience.</p></div></div>
+        <div class="step"><span class="step-n">04</span><div><h5>Review</h5><p>Monthly for detail, quarterly for direction.</p></div></div>
+      </div>
+    </div>
+    <div class="grid" style="align-content:start">
+      <div class="card">
+        <div class="kicker">By audience</div>
+        <p><b style="color:var(--text)">Leadership:</b> themes, expected outcomes and bets.</p>
+        <p><b style="color:var(--text)">Team:</b> problems, priorities and dependencies.</p>
+        <p><b style="color:var(--text)">Customers and partner areas:</b> expected benefits, without exact dates when uncertainty is high.</p>
+      </div>
+      <div class="card" style="border-left:1px solid var(--bad)">
+        <div class="kicker" style="color:var(--bad)">Anti-patterns</div>
+        <ul class="list">
+          <li>Roadmap as a list of promised features</li>
+          <li>Fixed dates with no room for discovery</li>
+          <li>Items with no link to OKRs or metrics</li>
+          <li>A document created once and never revisited</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PRIORITIZATION ===================== -->
+<section class="section" id="priorizacao" data-title="Prioritization">
+  <div class="eyebrow">03 · Strategy</div>
+  <h1 class="title">Prioritization <em>frameworks</em></h1>
+  <p class="lede">No framework decides on its own. They make criteria explicit and keep the conversation objective. Use the numbers to compare, not to end the discussion.</p>
+
+  <div class="block">
+    <div class="block-head"><h2>Which one to use?</h2></div>
+    <div class="card table-wrap">
+      <table class="table">
+        <thead><tr><th>Situation</th><th>Framework</th></tr></thead>
+        <tbody>
+          <tr><td>Quick triage of ideas in a workshop</td><td><span class="go">Value × Effort</span></td></tr>
+          <tr><td>Comparing many initiatives when usage data exists</td><td><span class="go">RICE</span></td></tr>
+          <tr><td>Experiments and fast growth decisions</td><td><span class="go">ICE</span></td></tr>
+          <tr><td>Locking the scope of a fixed-date delivery</td><td><span class="go">MoSCoW</span></td></tr>
+          <tr><td>Several teams competing for capacity, when timing changes value</td><td><span class="go">WSJF / Cost of Delay</span></td></tr>
+          <tr><td>Understanding what is basic and what delights users</td><td><span class="go">Kano</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Value × Effort</h2><span>2×2 matrix</span></div>
+    <div class="matrix">
+      <div class="axis y">Value ↑</div>
+      <div class="cell best"><h5>Quick wins</h5><p>High value, low effort. Do first.</p></div>
+      <div class="cell"><h5>Big bets</h5><p>High value, high effort. Plan and slice.</p></div>
+      <div class="cell"><h5>Fill-ins</h5><p>Low value, low effort. Do if capacity allows.</p></div>
+      <div class="cell" style="background:transparent;border-style:dashed"><h5>Avoid</h5><p>Low value, high effort. Drop or rethink.</p></div>
+      <div class="axis x">Effort →</div>
+    </div>
+  </div>
+
+  <div class="block grid g2">
+    <div class="card hl" style="grid-column:1/-1">
+      <div class="kicker">RICE</div>
+      <h4>Reach, Impact, Confidence and Effort</h4>
+      <div class="formula">(<em>Reach</em> × <em>Impact</em> × <em>Confidence</em>) ÷ <em>Effort</em></div>
+      <div class="grid g4">
+        <div><h5>Reach</h5><p>How many people are affected in a period (e.g. users per quarter).</p></div>
+        <div><h5>Impact</h5><p>How much it changes for each person: 3 massive, 2 high, 1 medium, 0.5 low, 0.25 minimal.</p></div>
+        <div><h5>Confidence</h5><p>How solid the evidence is: 100% high, 80% medium, 50% low.</p></div>
+        <div><h5>Effort</h5><p>Total team work, in person-weeks or person-months.</p></div>
+      </div>
+      <div class="calc" id="rice">
+        <div><label for="rReach">Reach</label><input id="rReach" type="number" min="0" value="2000"></div>
+        <div><label for="rImpact">Impact</label>
+          <select id="rImpact"><option value="3">3 · Massive</option><option value="2" selected>2 · High</option><option value="1">1 · Medium</option><option value="0.5">0.5 · Low</option><option value="0.25">0.25 · Minimal</option></select></div>
+        <div><label for="rConf">Confidence</label>
+          <select id="rConf"><option value="1">100% · High</option><option value="0.8" selected>80% · Medium</option><option value="0.5">50% · Low</option></select></div>
+        <div><label for="rEffort">Effort</label><input id="rEffort" type="number" min="0.1" step="0.5" value="4"></div>
+        <div class="score"><b id="rScore">800</b><span>RICE score</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="kicker">ICE</div>
+      <h4>Impact, Confidence and Ease</h4>
+      <div class="formula"><em>Impact</em> × <em>Confidence</em> × <em>Ease</em></div>
+      <p>Each criterion is scored 1 to 10. Lighter than RICE and useful for comparing experiments quickly.</p>
+      <div class="when"><b>Watch out</b>Scores are subjective. Calibrate with the team and revisit once you have results.</div>
+    </div>
+    <div class="card">
+      <div class="kicker">WSJF · Cost of Delay</div>
+      <h4>Weighted Shortest Job First</h4>
+      <div class="formula">(<em>Value</em> + <em>Urgency</em> + <em>Risk reduction</em>) ÷ <em>Size</em></div>
+      <p>Prioritizes what delivers the most value per unit of time and shows what waiting costs.</p>
+      <div class="when"><b>Watch out</b>Works best with relative scores (Fibonacci scale), comparing items against each other.</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>MoSCoW</h2><span>For fixed-date scope</span></div>
+    <div class="grid g4">
+      <div class="moscow m1"><div class="letter">M</div><h5>Must have</h5><p>Without it the delivery doesn't work or doesn't make sense.</p></div>
+      <div class="moscow m2"><div class="letter">S</div><h5>Should have</h5><p>Important, but there's a temporary workaround.</p></div>
+      <div class="moscow m3"><div class="letter">C</div><h5>Could have</h5><p>Desirable, included if there's capacity.</p></div>
+      <div class="moscow"><div class="letter" style="color:var(--muted)">W</div><h5>Won't have (now)</h5><p>Out of this scope, recorded for later.</p></div>
+    </div>
+    <p class="block-intro" style="margin-top:14px">Common rule of thumb: "Musts" shouldn't exceed ~60% of the effort, leaving room for the unexpected.</p>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Kano model</h2><span>Perceived value</span></div>
+    <div class="grid g3">
+      <div class="card"><div class="kicker">Basic</div><h4>Must-be</h4><p>Their absence causes dissatisfaction, but their presence doesn't delight. E.g. login working.</p></div>
+      <div class="card"><div class="kicker">Performance</div><h4>More is better</h4><p>Satisfaction grows with quality. E.g. speed, fewer steps.</p></div>
+      <div class="card"><div class="kicker">Delighters</div><h4>Surprising</h4><p>Nobody asks for them, but they create excitement. Over time, they become basics.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== UPSTREAM ===================== -->
+<section class="section" id="upstream" data-title="Upstream and Downstream">
+  <div class="eyebrow">04 · Discovery</div>
+  <h1 class="title">Upstream and <em>Downstream</em></h1>
+  <p class="lede">Separating conception from execution ensures the team understands the problem before investing in development. The two tracks run in parallel and feed each other all the time.</p>
+
+  <div class="block grid g2">
+    <div class="card hl">
+      <div class="kicker">Upstream · Conception</div>
+      <h4>Decide what to build</h4>
+      <div class="steps">
+        <div class="step"><span class="step-n">01</span><div><h5>Explore the problem</h5><p>Understand the root of the request.</p></div></div>
+        <div class="step"><span class="step-n">02</span><div><h5>Connect to strategy</h5><p>Relate it to the vision and OKRs.</p></div></div>
+        <div class="step"><span class="step-n">03</span><div><h5>Run discovery</h5><p>Research and test hypotheses.</p></div></div>
+        <div class="step"><span class="step-n">04</span><div><h5>Validate the minimum solution</h5><p>Prototypes and user tests.</p></div></div>
+      </div>
+    </div>
+    <div class="card" style="border-top:1px solid var(--line-2)">
+      <div class="kicker" style="color:var(--text-2)">Downstream · Execution</div>
+      <h4>Build it well</h4>
+      <div class="steps">
+        <div class="step"><span class="step-n">01</span><div><h5>Detail requirements</h5><p>Stories with clear acceptance criteria.</p></div></div>
+        <div class="step"><span class="step-n">02</span><div><h5>Develop</h5><p>Incremental deliveries in short cycles.</p></div></div>
+        <div class="step"><span class="step-n">03</span><div><h5>Test and accept</h5><p>Quality checks and business validation.</p></div></div>
+        <div class="step"><span class="step-n">04</span><div><h5>Measure impact</h5><p>Compare results with the success metric.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block grid g2">
+    <div class="card side">
+      <div class="kicker">Handover criteria</div>
+      <h4>Ready for downstream when…</h4>
+      <ul class="list check">
+        <li>The problem has been validated with evidence</li>
+        <li>The success metric has a baseline and a target</li>
+        <li>The solution has been tested with users</li>
+        <li>Technical feasibility has been confirmed</li>
+        <li>There are stories with acceptance criteria (Definition of Ready)</li>
+      </ul>
+    </div>
+    <div class="grid" style="align-content:start">
+      <div class="card"><h5>Don't skip upstream steps</h5><p>Building the wrong thing fast costs more than slowly discovering the right thing.</p></div>
+      <div class="card"><h5>Define success before building</h5><p>Without a metric defined upfront, there's no way to tell later whether it worked.</p></div>
+      <div class="card"><h5>Close the loop</h5><p>What you learn by measuring downstream feeds the next upstream.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DISCOVERY & DESIGN ===================== -->
+<section class="section" id="discovery" data-title="From problem to solution">
+  <div class="eyebrow">05 · Discovery</div>
+  <h1 class="title">From problem to <em>solution</em></h1>
+  <p class="lede">Discovery and design go hand in hand. First understand and choose the right problem, then create and validate the right solution, diverging and converging twice.</p>
+
+  <div class="block">
+    <div class="block-head"><h2>Double Diamond</h2><span>Diverge and converge twice</span></div>
+    <div class="grid" style="grid-template-columns:1fr 1fr;margin-bottom:8px">
+      <div class="kicker" style="text-align:center;margin:0">Problem space</div>
+      <div class="kicker" style="text-align:center;margin:0">Solution space</div>
+    </div>
+    <svg class="diamond" viewBox="0 0 800 140" aria-hidden="true">
+      <polygon points="10,70 200,10 390,70 200,130" fill="rgba(155,127,212,0.08)" stroke="#9B7FD4" stroke-width="1"/>
+      <polygon points="410,70 600,10 790,70 600,130" fill="none" stroke="#9B7FD4" stroke-width="1" stroke-dasharray="4 4"/>
+      <line x1="200" y1="10" x2="200" y2="130" stroke="#3a3456" stroke-width="1"/>
+      <line x1="600" y1="10" x2="600" y2="130" stroke="#3a3456" stroke-width="1"/>
+      <text x="400" y="76" text-anchor="middle" fill="#D4C4F0" font-family="Cormorant Garamond, serif" font-style="italic" font-size="18">→</text>
+    </svg>
+    <div class="grid g4">
+      <div class="phase"><div class="mode">Diverge</div><h5>Discover</h5><p>Research the context, the people and the problem broadly.</p></div>
+      <div class="phase"><div class="mode">Converge</div><h5>Define</h5><p>Synthesize findings and choose the right problem to solve.</p></div>
+      <div class="phase"><div class="mode">Diverge</div><h5>Develop</h5><p>Generate multiple possible solutions, prototype and test.</p></div>
+      <div class="phase"><div class="mode">Converge</div><h5>Deliver</h5><p>Refine the validated solution and prepare the handover to downstream.</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>The four risks</h2><span>What this process reduces</span></div>
+    <div class="grid g4">
+      <div class="card hl"><div class="kicker">Value</div><h4>Will they want it?</h4><p>Will people use or buy the solution?</p></div>
+      <div class="card hl"><div class="kicker">Usability</div><h4>Can they use it?</h4><p>Can they understand and use it without help?</p></div>
+      <div class="card hl"><div class="kicker">Feasibility</div><h4>Can we build it?</h4><p>With the technology, time and people we have?</p></div>
+      <div class="card hl"><div class="kicker">Business viability</div><h4>Does it make sense?</h4><p>Does it work for the business: cost, legal, operations, brand?</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Diamond 1 · The right problem</h2><span>Discover → Define</span></div>
+    <div class="grid g2" style="margin-bottom:16px">
+      <div class="card">
+        <div class="kicker">Understand the problem</div>
+        <span class="tag muted">In-depth interviews</span><span class="tag muted">Contextual observation</span><span class="tag muted">Usage data analysis</span><span class="tag muted">Feedback and support analysis</span><span class="tag muted">Jobs to be Done</span>
+      </div>
+      <div class="card">
+        <div class="kicker">Synthesize and choose the opportunity</div>
+        <span class="tag muted">Personas</span><span class="tag muted">Journey map</span><span class="tag muted">Opportunity Solution Tree</span><span class="tag muted">Assumption mapping</span>
+      </div>
+    </div>
+    <div class="card side">
+      <div class="kicker">Output of diamond 1 · The hypothesis</div>
+      <p class="template"><b>We believe that</b> <em>[solution]</em> <b>for</b> <em>[audience]</em> <b>will result in</b> <em>[expected change]</em>. <b>We'll know it worked when</b> <em>[metric]</em> <b>goes from</b> <em>[baseline]</em> <b>to</b> <em>[target]</em>.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Diamond 2 · The right solution</h2><span>Develop → Deliver</span></div>
+    <p class="block-intro">Match the fidelity to the question you want to answer.</p>
+    <div class="grid g4" style="margin-bottom:24px">
+      <div class="phase"><div class="mode">Minutes</div><h5>Sketch</h5><p>Explore many ideas quickly.</p></div>
+      <div class="phase"><div class="mode">Hours</div><h5>Wireframe</h5><p>Structure, hierarchy and flow.</p></div>
+      <div class="phase"><div class="mode">Days</div><h5>Clickable prototype</h5><p>Test the flow with users.</p></div>
+      <div class="phase"><div class="mode">Days to weeks</div><h5>High fidelity</h5><p>Validate visual details and prepare the handoff.</p></div>
+    </div>
+    <div class="grid g3">
+      <div class="card hl"><div class="kicker">Usability testing</div><h4>Find real problems</h4>
+        <ul class="list"><li>Define critical tasks and success criteria</li><li>5 to 8 participants per round reveal most problems</li><li>Measure success, time and errors, and record sessions</li></ul></div>
+      <div class="card hl"><div class="kicker">Other validations</div><h4>Test before building</h4>
+        <span class="tag muted">Card sorting</span><span class="tag muted">Fake door</span><span class="tag muted">Concierge / Wizard of Oz</span><span class="tag muted">A/B test</span></div>
+      <div class="card hl"><div class="kicker">Handoff</div><h4>Handover to development</h4>
+        <ul class="list check"><li>States: empty, loading, error and success</li><li>Edge cases and extreme content</li><li>Responsive behavior and interactions</li><li>Final copy and accessibility requirements</li></ul></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>What sustains quality</h2><span>Throughout the process</span></div>
+    <div class="grid g3">
+      <div class="card side"><div class="kicker">Design System</div>
+        <ul class="list"><li>Design tokens: color, typography, spacing</li><li>Component library in design and code</li><li>Documentation with usage examples</li><li>Governance: how to contribute and version</li></ul></div>
+      <div class="card side"><div class="kicker">Accessibility</div>
+        <ul class="list"><li>Reference: WCAG level AA</li><li>Minimum 4.5:1 contrast for text</li><li>Full keyboard navigation</li><li>Alt text, and never rely on color alone</li></ul></div>
+      <div class="card side"><div class="kicker">UX metrics</div>
+        <ul class="list"><li>Task success rate</li><li>Time on task and error rate</li><li>SUS (System Usability Scale)</li><li>Satisfaction and perceived effort</li></ul></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Examples</h2><span>Illustrative cases</span></div>
+    <div class="grid g3">
+      <div class="card case hl">
+        <h4>Online learning platform</h4>
+        <dl>
+          <div><dt>Signal</dt><dd>Most students stop watching at the second lesson.</dd></div>
+          <div><dt>Discovery</dt><dd>Interviews show many people study while commuting, and 40-minute lessons don't fit that time.</dd></div>
+          <div><dt>Solution tested</dt><dd>Lessons in 10-minute blocks, with progress saved automatically.</dd></div>
+          <div><dt>Learning</dt><dd>The format has to fit the moment people use the product.</dd></div>
+        </dl>
+      </div>
+      <div class="card case hl">
+        <h4>Recipe app</h4>
+        <dl>
+          <div><dt>Signal</dt><dd>Lots of recipes get saved, but few get cooked.</dd></div>
+          <div><dt>Discovery</dt><dd>In-home observation shows the obstacle appears at cooking time: there's always an ingredient missing.</dd></div>
+          <div><dt>Solution tested</dt><dd>A shopping list generated from the recipe. A fake door measured interest before building.</dd></div>
+          <div><dt>Learning</dt><dd>High intent doesn't guarantee action. You need to remove friction from the next step.</dd></div>
+        </dl>
+      </div>
+      <div class="card case hl">
+        <h4>Fitness studio booking app</h4>
+        <dl>
+          <div><dt>Signal</dt><dd>Many class bookings are cancelled at the last minute.</dd></div>
+          <div><dt>Discovery</dt><dd>People book several classes "to secure a spot", because classes fill up fast.</dd></div>
+          <div><dt>Solution tested</dt><dd>A waitlist with automatic alerts when a spot opens, tested as a prototype.</dd></div>
+          <div><dt>Learning</dt><dd>Unwanted behavior is often a logical response to one of the product's own rules.</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="card">
+      <div class="kicker">Good practices</div>
+      <ul class="list">
+        <li><b style="color:var(--text)">Continuous discovery:</b> frequent contact with users, not only at the start of projects.</li>
+        <li><b style="color:var(--text)">Product trio:</b> product, design and engineering work together across both diamonds.</li>
+        <li><b style="color:var(--text)">Record learnings:</b> evidence, decisions and discarded hypotheses stay accessible to the team.</li>
+        <li><b style="color:var(--text)">Dropping early is success:</b> an idea invalidated in a prototype saves weeks of development.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== WORK STRUCTURE ===================== -->
+<section class="section" id="estrutura" data-title="Work structure">
+  <div class="eyebrow">06 · Delivery</div>
+  <h1 class="title">Work <em>structure</em></h1>
+  <p class="lede">A shared hierarchy connects strategy to the team's day-to-day work. Names vary between tools; what matters is the relationship between levels.</p>
+
+  <div class="block">
+    <div class="block-head"><h2>Hierarchy</h2></div>
+    <div class="hier">
+      <div class="hier-row"><div><h5>Initiative</h5><p>Strategic bet linked to an OKR, grouping several epics.</p></div><span class="hz">a quarter or more</span></div>
+      <div class="hier-row" style="margin-left:24px"><div><h5>Epic</h5><p>A meaningful value delivery, broken down into stories.</p></div><span class="hz">weeks</span></div>
+      <div class="hier-row" style="margin-left:48px"><div><h5>Story · Task · Bug</h5><p>A unit of work that fits in one cycle.</p></div><span class="hz">days</span></div>
+      <div class="hier-row" style="margin-left:72px"><div><h5>Subtask</h5><p>A technical or operational step of a story.</p></div><span class="hz">hours</span></div>
+    </div>
+  </div>
+
+  <div class="block grid g2">
+    <div class="card side">
+      <div class="kicker">User story</div>
+      <p class="mono" style="color:var(--text);margin-bottom:12px">As a [persona], I want [action], so that [benefit]</p>
+      <p style="font-style:italic">E.g. As an event organizer, I want to export the attendee list, so that I can send it to the venue.</p>
+    </div>
+    <div class="card side">
+      <div class="kicker">Acceptance criteria</div>
+      <p class="mono" style="color:var(--text)">Given [context]<br>When [action]<br>Then [expected result]</p>
+      <p style="font-style:italic;margin-top:12px">E.g. Given an event with registrations, when I click export, then I get a file with each attendee's name and email.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>INVEST</h2><span>A good story is…</span></div>
+    <div class="grid g6">
+      <div class="card letter-card"><div class="big">I</div><h5>Independent</h5><p>Can be delivered without depending on another.</p></div>
+      <div class="card letter-card"><div class="big">N</div><h5>Negotiable</h5><p>Opens a conversation, not a closed contract.</p></div>
+      <div class="card letter-card"><div class="big">V</div><h5>Valuable</h5><p>Delivers noticeable value.</p></div>
+      <div class="card letter-card"><div class="big">E</div><h5>Estimable</h5><p>The team understands it well enough to estimate.</p></div>
+      <div class="card letter-card"><div class="big">S</div><h5>Small</h5><p>Fits comfortably in one cycle.</p></div>
+      <div class="card letter-card"><div class="big">T</div><h5>Testable</h5><p>Has clear acceptance criteria.</p></div>
+    </div>
+  </div>
+
+  <div class="block grid g3">
+    <div class="card"><div class="kicker">Definition of Ready</div><h4>Can start</h4>
+      <ul class="list check"><li>Clear value and goal</li><li>Acceptance criteria defined</li><li>Design available, if needed</li><li>Dependencies mapped</li><li>Estimated by the team</li></ul></div>
+    <div class="card"><div class="kicker">Definition of Done</div><h4>Is done</h4>
+      <ul class="list check"><li>Acceptance criteria met</li><li>Code reviewed and tested</li><li>No open critical bugs</li><li>Documentation updated</li><li>Live in production or ready to release</li></ul></div>
+    <div class="card"><div class="kicker">Epic checklist</div><h4>Before breaking it down</h4>
+      <ul class="list check"><li>Problem and success metric defined</li><li>Flow mapped and validated</li><li>Prototype tested</li><li>Technical feasibility confirmed</li><li>Stories created with acceptance criteria</li></ul></div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Recommended views</h2></div>
+    <span class="tag">Strategic · Initiatives</span><span class="tag">Upstream · Discovery</span><span class="tag">Design</span><span class="tag">Downstream · Delivery</span><span class="tag">Maintenance · Bugs</span>
+  </div>
+</section>
+
+<!-- ===================== BACKLOG ===================== -->
+<section class="section" id="backlog" data-title="Backlog and refinement">
+  <div class="eyebrow">07 · Delivery</div>
+  <h1 class="title">Backlog and <em>refinement</em></h1>
+  <p class="lede">A living, prioritized list of what could create value. A healthy backlog is detailed at the top and more open at the bottom.</p>
+
+  <div class="block">
+    <div class="block-head"><h2>The iceberg</h2></div>
+    <div class="iceberg">
+      <div class="ice i1"><h5>Next cycles</h5><p>Small stories, refined and estimated</p></div>
+      <div class="ice i2"><h5>Next months</h5><p>Prioritized epics, partially refined</p></div>
+      <div class="ice i3"><h5>Future</h5><p>Opportunities and ideas, with little detail</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>DEEP</h2><span>Traits of a good backlog</span></div>
+    <div class="grid g4">
+      <div class="card letter-card"><div class="big">D</div><h5>Detailed appropriately</h5><p>More detail on what comes first.</p></div>
+      <div class="card letter-card"><div class="big">E</div><h5>Estimated</h5><p>Top items have estimates.</p></div>
+      <div class="card letter-card"><div class="big">E</div><h5>Emergent</h5><p>Changes as you learn.</p></div>
+      <div class="card letter-card"><div class="big">P</div><h5>Prioritized</h5><p>The order reflects value and risk.</p></div>
+    </div>
+  </div>
+
+  <div class="block grid g3">
+    <div class="card hl"><div class="kicker">Refinement</div><h4>Prepare what's next</h4>
+      <ul class="list"><li>Ongoing, not only right before planning</li><li>Common rule of thumb: up to ~10% of team capacity</li><li>Focus on items for the next 1 to 2 cycles</li></ul></div>
+    <div class="card hl"><div class="kicker">Hygiene</div><h4>Keep it lean</h4>
+      <ul class="list"><li>Review items that have been idle for a long time</li><li>Archive what's no longer relevant</li><li>Merge duplicates and similar items</li></ul></div>
+    <div class="card hl"><div class="kicker">Flow</div><h4>Limit WIP</h4>
+      <ul class="list"><li>Fewer items in parallel, faster deliveries</li><li>Finish before starting something new</li><li>Make bottlenecks visible on the board</li></ul></div>
+  </div>
+</section>
+
+<!-- ===================== ESTIMATION ===================== -->
+<section class="section" id="estimativas" data-title="Estimation">
+  <div class="eyebrow">08 · Delivery</div>
+  <h1 class="title">Collaborative <em>estimation</em></h1>
+  <p class="lede">Relative estimates measure effort by considering complexity, risk and uncertainty. They exist to plan and spark conversation, not to enforce deadlines.</p>
+
+  <div class="block grid g2">
+    <div class="card">
+      <div class="kicker">Story points · Fibonacci</div>
+      <div class="fib"><span class="lo">0</span><span class="lo">1</span><span class="lo">2</span><span class="lo">3</span><span>5</span><span>8</span><span class="hi">13</span><span class="hi">20</span><span class="hi">40</span></div>
+      <p>The gaps grow with size because uncertainty grows too. Items that are too big should be split.</p>
+    </div>
+    <div class="card side spidr">
+      <div class="kicker">SPIDR · How to split stories</div>
+      <p><b>S</b>pikes: investigate first to reduce uncertainty</p>
+      <p><b>P</b>aths: one alternative path of the flow at a time</p>
+      <p><b>I</b>nterfaces: one channel, device or integration at a time</p>
+      <p><b>D</b>ata: one type or subset of data at a time</p>
+      <p><b>R</b>ules: one business rule at a time</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Alternatives</h2></div>
+    <div class="grid g3">
+      <div class="card hl"><div class="kicker">T-shirt sizing</div><h4>XS · S · M · L · XL</h4><p>Good for epics and roadmaps, when precision isn't needed.</p></div>
+      <div class="card hl"><div class="kicker">Throughput forecasting</div><h4>Use history</h4><p>Count how many items the team delivers per week and project scenarios from it.</p></div>
+      <div class="card hl"><div class="kicker">Right-sizing</div><h4>Similar-sized items</h4><p>Split everything into small, similar pieces and count items instead of points.</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="card">
+      <div class="kicker">Good practices</div>
+      <ul class="list">
+        <li>Define reference stories to calibrate what each size means</li>
+        <li>Whoever does the work estimates it</li>
+        <li>Don't convert points into hours</li>
+        <li>Don't compare velocity across teams: each one has its own scale</li>
+        <li>Keep sessions short. If it drags, the story needs more refinement</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== RITUALS ===================== -->
+<section class="section" id="rituais" data-title="Rituals">
+  <div class="eyebrow">09 · Delivery</div>
+  <h1 class="title">Rituals and <em>ceremonies</em></h1>
+  <p class="lede">Meetings with a clear purpose create cadence and transparency. If a ritual produces neither decisions nor learning, change the format.</p>
+
+  <div class="block">
+    <div class="block-head"><h2>Cadence</h2><span>Reference for 2-week cycles</span></div>
+    <div class="cadence">
+      <div class="cad"><div class="freq">Daily</div><p>Daily stand-up</p></div>
+      <div class="cad"><div class="freq">Weekly</div><p>Refinement · metrics check-in</p></div>
+      <div class="cad"><div class="freq">Per cycle</div><p>Planning · Review · Retrospective</p></div>
+      <div class="cad"><div class="freq">Monthly to quarterly</div><p>OKR and roadmap review</p></div>
+    </div>
+  </div>
+
+  <div class="block grid g3">
+    <div class="card hl">
+      <div class="cer-head"><h4>Daily</h4><span class="dur">~15 min</span></div>
+      <p class="cer-freq">Every day</p>
+      <ul class="list"><li>How are we doing against the cycle goal?</li><li>What will we do today?</li><li>Is anything blocking us?</li></ul>
+      <p class="tip">To coordinate work, not to report status.</p>
+    </div>
+    <div class="card hl">
+      <div class="cer-head"><h4>Planning</h4><span class="dur">1–2 h</span></div>
+      <p class="cer-freq">Start of cycle</p>
+      <ul class="list"><li>What is the cycle goal?</li><li>What is the team's real capacity?</li><li>Which items go in?</li></ul>
+      <p class="tip">Start with the goal, not the task list.</p>
+    </div>
+    <div class="card hl">
+      <div class="cer-head"><h4>Refinement</h4><span class="dur">~1 h</span></div>
+      <p class="cer-freq">Weekly</p>
+      <ul class="list"><li>Are the problem and scope clear?</li><li>Are the acceptance criteria complete?</li><li>Does it need splitting?</li></ul>
+      <p class="tip">Prepare upcoming cycles ahead of time.</p>
+    </div>
+    <div class="card hl">
+      <div class="cer-head"><h4>Review</h4><span class="dur">30–60 min</span></div>
+      <p class="cer-freq">End of cycle</p>
+      <ul class="list"><li>What was delivered?</li><li>Working demo</li><li>Stakeholder feedback</li></ul>
+      <p class="tip">Show value and outcomes, not tasks.</p>
+    </div>
+    <div class="card hl">
+      <div class="cer-head"><h4>Retrospective</h4><span class="dur">45–90 min</span></div>
+      <p class="cer-freq">End of cycle</p>
+      <ul class="list"><li>What worked?</li><li>What can we improve?</li><li>Which concrete action will we try?</li></ul>
+      <p class="tip">A safe space, few actions, each with an owner.</p>
+    </div>
+    <div class="card hl">
+      <div class="cer-head"><h4>Strategic review</h4><span class="dur">1–2 h</span></div>
+      <p class="cer-freq">Monthly or quarterly</p>
+      <ul class="list"><li>How are the OKRs doing?</li><li>Does the roadmap still make sense?</li><li>Which blockers need leadership?</li></ul>
+      <p class="tip">Connects day-to-day work to strategy.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Retrospective formats</h2><span>Vary them to keep people engaged</span></div>
+    <div class="grid g4">
+      <div class="card plain"><h5>Start · Stop · Continue</h5><p>What to start, stop and keep doing.</p></div>
+      <div class="card plain"><h5>4Ls</h5><p>Liked, Learned, Lacked, Longed for.</p></div>
+      <div class="card plain"><h5>Sailboat</h5><p>Wind (boosts), anchors (drags), rocks (risks) and island (goal).</p></div>
+      <div class="card plain"><h5>Timeline</h5><p>Rebuild the cycle and mark the highs and lows.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== OUTCOMES ===================== -->
+<section class="section" id="resultados" data-title="Measuring outcomes">
+  <div class="eyebrow">10 · Learning</div>
+  <h1 class="title">Measuring <em>outcomes</em></h1>
+  <p class="lede">Shipping is not the end. Measuring impact closes the loop and informs the next decision.</p>
+
+  <div class="quote">If we don't define upfront how to measure success, any result afterwards looks good enough.</div>
+
+  <div class="block">
+    <div class="block-head"><h2>Before shipping, define</h2></div>
+    <div class="def-row">
+      <div><b>Metric</b><span>What will change</span></div>
+      <div><b>Baseline</b><span>Current value</span></div>
+      <div><b>Target</b><span>Expected value</span></div>
+      <div><b>Timeframe</b><span>When to measure</span></div>
+      <div><b>Source</b><span>Where the data comes from</span></div>
+      <div><b>Owner</b><span>Who tracks it</span></div>
+    </div>
+  </div>
+
+  <div class="block grid g2">
+    <div class="card hl">
+      <div class="kicker">North Star Metric</div>
+      <h4>One metric that captures the value delivered</h4>
+      <p>Shows whether the product is creating value for customers sustainably. It is supported by input metrics that teams can influence.</p>
+      <div class="when"><b>Examples</b>Streaming: hours watched · Marketplace: completed transactions · Collaboration tool: weekly active teams</div>
+    </div>
+    <div class="card hl">
+      <div class="kicker">Indicators</div>
+      <h4>Leading and lagging</h4>
+      <p><b style="color:var(--text)">Leading:</b> change quickly and predict the outcome. E.g. first-week activation.</p>
+      <p><b style="color:var(--text)">Lagging:</b> confirm the outcome, but take time to show. E.g. annual retention, revenue.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>HEART</h2><span>User-centered metrics</span></div>
+    <div class="grid g5">
+      <div class="card letter-card"><div class="big">H</div><h5>Happiness</h5><p>Satisfaction and perception</p><p class="ex">NPS, CSAT</p></div>
+      <div class="card letter-card"><div class="big">E</div><h5>Engagement</h5><p>Intensity of use</p><p class="ex">Sessions per week</p></div>
+      <div class="card letter-card"><div class="big">A</div><h5>Adoption</h5><p>New users of something</p><p class="ex">% who used the feature</p></div>
+      <div class="card letter-card"><div class="big">R</div><h5>Retention</h5><p>Who comes back</p><p class="ex">D30 retention</p></div>
+      <div class="card letter-card"><div class="big">T</div><h5>Task success</h5><p>Efficiency and effectiveness</p><p class="ex">Completion rate</p></div>
+    </div>
+    <p class="block-intro" style="margin-top:14px">For each dimension: <b style="color:var(--text)">Goal</b> → <b style="color:var(--text)">Signal</b> that shows progress → <b style="color:var(--text)">Metric</b> that measures the signal.</p>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>AARRR</h2><span>Lifecycle funnel</span></div>
+    <div class="grid g5">
+      <div class="phase"><div class="mode">01</div><h5>Acquisition</h5><p>How people arrive</p></div>
+      <div class="phase"><div class="mode">02</div><h5>Activation</h5><p>First experience of value</p></div>
+      <div class="phase"><div class="mode">03</div><h5>Retention</h5><p>They come back</p></div>
+      <div class="phase"><div class="mode">04</div><h5>Revenue</h5><p>They create value for the business</p></div>
+      <div class="phase"><div class="mode">05</div><h5>Referral</h5><p>They recommend it to others</p></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-head"><h2>Flow metrics</h2><span>Delivery health</span></div>
+    <div class="grid g4">
+      <div class="card"><div class="kicker">Lead time</div><p>From request to delivery. The time the customer perceives.</p></div>
+      <div class="card"><div class="kicker">Cycle time</div><p>From starting work to completion.</p></div>
+      <div class="card"><div class="kicker">Throughput</div><p>Items completed per period.</p></div>
+      <div class="card"><div class="kicker">WIP</div><p>Items in progress at the same time.</p></div>
+    </div>
+  </div>
+
+  <div class="block grid g2">
+    <div class="card">
+      <div class="kicker">Tracking routine</div>
+      <div class="steps">
+        <div class="step"><span class="step-n">W</span><div><h5>Weekly</h5><p>Team metrics and KR check-in.</p></div></div>
+        <div class="step"><span class="step-n">M</span><div><h5>Monthly</h5><p>Trends, learnings and initiative adjustments.</p></div></div>
+        <div class="step"><span class="step-n">Q</span><div><h5>Quarterly</h5><p>OKR close-out and strategy review.</p></div></div>
+      </div>
+    </div>
+    <div class="card" style="border-left:1px solid var(--bad)">
+      <div class="kicker" style="color:var(--bad)">Anti-patterns</div>
+      <ul class="list">
+        <li>Vanity metrics that only go up and don't guide decisions</li>
+        <li>Measuring only output: features, tasks, points</li>
+        <li>Metrics with no owner and no reading routine</li>
+        <li>Measuring everything and acting on nothing</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== GLOSSARY ===================== -->
+<section class="section" id="glossario" data-title="Glossary">
+  <div class="eyebrow">11 · Reference</div>
+  <h1 class="title">Glossary of <em>terms</em></h1>
+  <p class="lede">A shared language for product, design, engineering and business.</p>
+
+  <div class="gloss-filter"><input type="search" id="glossFilter" placeholder="Filter terms…" aria-label="Filter terms"></div>
+  <div class="gloss-grid" id="glossGrid">
+    <div class="term"><h5>Acceptance criteria</h5><p>Conditions that define when a story meets expectations.</p></div>
+    <div class="term"><h5>Agile</h5><p>An iterative approach, with incremental delivery and continuous adaptation based on feedback.</p></div>
+    <div class="term"><h5>Backlog</h5><p>An ordered, living list of items that could create value for the product.</p></div>
+    <div class="term"><h5>Baseline</h5><p>The current value of a metric, the starting point for measuring change.</p></div>
+    <div class="term"><h5>Cycle time</h5><p>Time between starting work on an item and finishing it.</p></div>
+    <div class="term"><h5>Definition of Done</h5><p>Team agreement on what it means for an item to be done.</p></div>
+    <div class="term"><h5>Definition of Ready</h5><p>Agreement on what an item needs before development can start.</p></div>
+    <div class="term"><h5>Discovery</h5><p>Investigation to understand problems and validate solutions before building.</p></div>
+    <div class="term"><h5>Downstream</h5><p>The execution track: detailing, development, testing and delivery.</p></div>
+    <div class="term"><h5>Epic</h5><p>A meaningful value delivery, split into smaller stories.</p></div>
+    <div class="term"><h5>Hypothesis</h5><p>An explicit, testable assumption about the effect of a solution.</p></div>
+    <div class="term"><h5>Initiative</h5><p>A strategic bet linked to an objective, grouping epics.</p></div>
+    <div class="term"><h5>Key Result</h5><p>A measurable result that shows progress toward an objective.</p></div>
+    <div class="term"><h5>Lead time</h5><p>Time between requesting an item and delivering it to the customer.</p></div>
+    <div class="term"><h5>MVP</h5><p>The smallest version of a solution that can produce validated learning.</p></div>
+    <div class="term"><h5>North Star Metric</h5><p>The main metric representing the value delivered to customers.</p></div>
+    <div class="term"><h5>Objective</h5><p>A qualitative, inspiring description of what you want to achieve.</p></div>
+    <div class="term"><h5>Outcome</h5><p>A change in behavior or in a metric caused by a delivery.</p></div>
+    <div class="term"><h5>Output</h5><p>What was produced: features, screens, documents.</p></div>
+    <div class="term"><h5>Product trio</h5><p>Product, design and engineering working together on discovery.</p></div>
+    <div class="term"><h5>Refinement</h5><p>The ongoing work of clarifying, splitting and estimating backlog items.</p></div>
+    <div class="term"><h5>Roadmap</h5><p>A communication of the product's direction over time.</p></div>
+    <div class="term"><h5>Sprint</h5><p>A fixed-length work cycle, usually 1 to 4 weeks.</p></div>
+    <div class="term"><h5>Story points</h5><p>A relative measure of effort, complexity and uncertainty.</p></div>
+    <div class="term"><h5>Throughput</h5><p>Number of items completed in a period.</p></div>
+    <div class="term"><h5>Upstream</h5><p>The conception track: exploration, discovery and validation.</p></div>
+    <div class="term"><h5>User story</h5><p>A short description of a need, from the user's point of view.</p></div>
+    <div class="term"><h5>UX · UI</h5><p>User experience (behavior and journey) and user interface (visual layer).</p></div>
+    <div class="term"><h5>Velocity</h5><p>Average points completed per cycle, used only by the team itself.</p></div>
+    <div class="term"><h5>WIP</h5><p>Work in progress: items being worked on at the same time.</p></div>
+  </div>
+  <p class="gloss-empty" id="glossEmpty">No terms found.</p>
+</section>
+
+</template>
+
+<footer class="footer">
+  <span id="footNote"><em>Guia de práticas de produto</em> · documento vivo, adapte ao contexto do seu time</span>
+  <span>Thayná Bordin · Product Ops &amp; DesignOps</span>
+</footer>
+
+<script>
+(function () {
+  const I18N = {
+    pt: { brand: 'Guia de práticas <em>de produto</em>', title: 'Guia de Práticas de Produto', search: 'Buscar no guia…',
+          prev: '← Anterior', next: 'Próximo →', empty: 'Nada encontrado para essa busca.', menu: 'Abrir menu', nav: 'Seções',
+          home: '← Portal',
+          foot: '<em>Guia de práticas de produto</em> · documento vivo, adapte ao contexto do seu time', locale: 'pt-BR', html: 'pt-BR' },
+    en: { brand: 'Product practices <em>guide</em>', title: 'Product Practices Guide', search: 'Search the guide…',
+          prev: '← Previous', next: 'Next →', empty: 'Nothing found for this search.', menu: 'Open menu', nav: 'Sections',
+          home: '← Portal',
+          foot: '<em>Product practices guide</em> · a living document, adapt it to your team’s context', locale: 'en-US', html: 'en' }
+  };
+  const $ = id => document.getElementById(id);
+  const body = document.body, sidebar = $('sidebar'), content = $('content');
+  const input = $('searchInput'), box = $('results');
+  const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  let lang = 'pt', sections = [], order = [], navItems = [], index = [], current = [], focusIdx = -1;
+
+  function pickLang() {
+    const q = new URLSearchParams(location.search).get('lang');
+    if (q === 'pt' || q === 'en') return q;
+    try { const s = localStorage.getItem('guide-lang'); if (s === 'pt' || s === 'en') return s; } catch (e) {}
+    return (navigator.language || 'pt').toLowerCase().startsWith('pt') ? 'pt' : 'en';
+  }
+
+  function setUrl(id) {
+    const url = new URL(location.href);
+    url.searchParams.set('lang', lang);
+    url.hash = id;
+    history.replaceState(null, '', url);
+  }
+
+  function show(id, opts = {}) {
+    if (!order.includes(id)) id = 'inicio';
+    sections.forEach(s => s.classList.toggle('active', s.dataset.id === id));
+    navItems.forEach(n => n.classList.toggle('active', n.dataset.go === id));
+    setUrl(id);
+    const sec = sections.find(s => s.dataset.id === id);
+    document.title = (id === 'inicio' ? '' : sec.dataset.title + ' · ') + I18N[lang].title;
+    body.classList.remove('nav-open');
+    if (!opts.keepScroll) window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+
+  function rice() {
+    if (!$('rReach')) return;
+    const v = id => parseFloat($(id).value) || 0;
+    const effort = v('rEffort');
+    const score = effort > 0 ? (v('rReach') * v('rImpact') * v('rConf')) / effort : 0;
+    $('rScore').textContent = score.toLocaleString(I18N[lang].locale, { maximumFractionDigits: 1 });
+  }
+
+  function filterGlossary() {
+    const q = norm(($('glossFilter') || { value: '' }).value.trim());
+    let visible = 0;
+    document.querySelectorAll('#glossGrid .term').forEach(t => {
+      const ok = !q || norm(t.textContent).includes(q);
+      t.style.display = ok ? '' : 'none';
+      if (ok) visible++;
+    });
+    if ($('glossEmpty')) $('glossEmpty').style.display = visible ? 'none' : 'block';
+  }
+
+  function render(newLang, keepId) {
+    lang = newLang;
+    const t = I18N[lang];
+    sidebar.innerHTML = $('tpl-nav-' + lang).innerHTML;
+    content.innerHTML = $('tpl-main-' + lang).innerHTML;
+    document.documentElement.lang = t.html;
+    $('brand').innerHTML = t.brand;
+    $('homeLink').textContent = t.home;
+    $('footNote').innerHTML = t.foot;
+    input.placeholder = t.search; input.setAttribute('aria-label', t.search);
+    $('menuBtn').setAttribute('aria-label', t.menu);
+    sidebar.setAttribute('aria-label', t.nav);
+    document.querySelectorAll('.lang button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+    try { localStorage.setItem('guide-lang', lang); } catch (e) {}
+
+    sections = Array.from(content.querySelectorAll('.section'));
+    // keep section ids out of the DOM so the browser never jumps to the #hash on its own
+    sections.forEach(sec => { sec.dataset.id = sec.id; sec.removeAttribute('id'); });
+    order = sections.map(s => s.dataset.id);
+    navItems = Array.from(sidebar.querySelectorAll('.nav-item'));
+
+    sections.forEach((sec, i) => {
+      const pager = document.createElement('div');
+      pager.className = 'pager';
+      const prev = sections[i - 1], next = sections[i + 1];
+      if (prev) pager.innerHTML += `<button class="prev" data-go="${prev.dataset.id}"><small>${t.prev}</small><span>${prev.dataset.title}</span></button>`;
+      if (next) pager.innerHTML += `<button class="next" data-go="${next.dataset.id}"><small>${t.next}</small><span>${next.dataset.title}</span></button>`;
+      sec.appendChild(pager);
+    });
+
+    index = [];
+    sections.forEach(sec => {
+      sec.querySelectorAll('h4, h5, p, li, td, .tag, dd').forEach(el => {
+        if (el.closest('.pager')) return;
+        const txt = el.textContent.replace(/\s+/g, ' ').trim();
+        if (txt.length < 3) return;
+        index.push({ id: sec.dataset.id, title: sec.dataset.title, el, txt, n: norm(txt) });
+      });
+    });
+
+    input.value = ''; box.classList.remove('open'); box.innerHTML = '';
+    rice();
+    show(keepId || 'inicio', { keepScroll: false });
+  }
+
+  // Navigation
+  document.addEventListener('click', e => {
+    const l = e.target.closest('.lang button');
+    if (l) { if (l.dataset.lang !== lang) render(l.dataset.lang, location.hash.slice(1)); return; }
+    const t = e.target.closest('[data-go]');
+    if (t) { e.preventDefault(); show(t.dataset.go); }
+  });
+  window.addEventListener('hashchange', () => show(location.hash.slice(1)));
+  $('menuBtn').addEventListener('click', () => body.classList.toggle('nav-open'));
+  $('overlay').addEventListener('click', () => body.classList.remove('nav-open'));
+
+  // Delegated inputs (RICE + glossary)
+  document.addEventListener('input', e => {
+    if (['rReach', 'rImpact', 'rConf', 'rEffort'].includes(e.target.id)) rice();
+    if (e.target.id === 'glossFilter') filterGlossary();
+  });
+
+  // Search
+  function snippet(txt, n, q) {
+    const i = n.indexOf(q);
+    const start = Math.max(0, i - 40), end = Math.min(txt.length, i + q.length + 60);
+    return (start > 0 ? '…' : '') + esc(txt.slice(start, i)) + '<mark>' + esc(txt.slice(i, i + q.length)) + '</mark>' + esc(txt.slice(i + q.length, end)) + (end < txt.length ? '…' : '');
+  }
+  function search() {
+    const q = norm(input.value.trim());
+    focusIdx = -1;
+    if (q.length < 2) { box.classList.remove('open'); box.innerHTML = ''; current = []; return; }
+    const seen = new Set();
+    current = index.filter(it => {
+      if (!it.n.includes(q)) return false;
+      const key = it.id + '|' + it.n;
+      if (seen.has(key)) return false;
+      seen.add(key); return true;
+    }).slice(0, 10);
+    box.innerHTML = current.length
+      ? current.map((it, i) => `<button class="result" data-i="${i}"><div class="result-sec">${esc(it.title)}</div><div class="result-txt">${snippet(it.txt, it.n, q)}</div></button>`).join('')
+      : `<div class="result-empty">${I18N[lang].empty}</div>`;
+    box.classList.add('open');
+  }
+  function openResult(i) {
+    const it = current[i];
+    if (!it) return;
+    show(it.id, { keepScroll: true });
+    box.classList.remove('open');
+    input.blur();
+    requestAnimationFrame(() => {
+      const y = it.el.getBoundingClientRect().top + window.scrollY - 120;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+      it.el.classList.remove('flash'); void it.el.offsetWidth; it.el.classList.add('flash');
+    });
+  }
+  input.addEventListener('input', search);
+  input.addEventListener('focus', () => { if (input.value.trim().length >= 2) search(); });
+  box.addEventListener('click', e => {
+    const b = e.target.closest('.result');
+    if (b) { e.stopPropagation(); openResult(+b.dataset.i); }
+  });
+  input.addEventListener('keydown', e => {
+    const items = box.querySelectorAll('.result');
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!items.length) return;
+      focusIdx = (focusIdx + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+      items.forEach((b, i) => b.classList.toggle('focus', i === focusIdx));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      openResult(focusIdx >= 0 ? focusIdx : 0);
+    } else if (e.key === 'Escape') {
+      input.value = ''; box.classList.remove('open'); input.blur();
+    }
+  });
+  document.addEventListener('click', e => { if (!e.target.closest('.search')) box.classList.remove('open'); });
+  document.addEventListener('keydown', e => {
+    const typing = /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);
+    if (e.key === '/' && !typing) { e.preventDefault(); input.focus(); }
+  });
+
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  render(pickLang(), location.hash.slice(1));
+})();
+</script>
+</body>
+</html>
