@@ -31,9 +31,9 @@
     .nav-links a:hover{color:var(--ink);}
 
     /* Hero */
-    .hero{min-height:68vh;display:grid;grid-template-columns:1.3fr 1fr;align-items:end;padding:9rem 3rem 5rem;gap:4rem;position:relative;overflow:hidden;}
-    .hero::before{content:'';position:absolute;top:0;right:0;width:38%;height:100%;background:var(--accent-light);z-index:0;}
-    .hero-text{position:relative;z-index:1;}
+    .hero{min-height:68vh;display:flex;align-items:flex-end;padding:9rem 3rem 5rem;position:relative;overflow:hidden;}
+    .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 75% at 100% 0%,rgba(155,127,212,.16) 0%,rgba(155,127,212,.05) 45%,transparent 75%);z-index:0;pointer-events:none;}
+    .hero-text{position:relative;z-index:1;width:100%;}
     .hero-eyebrow{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;}
     .hero-eyebrow::before{content:'';display:inline-block;width:2rem;height:1px;background:var(--accent);}
     .hero-name{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,6.5vw,6rem);font-weight:300;line-height:1;letter-spacing:-.01em;}
@@ -41,20 +41,12 @@
     .hero-title{font-size:.85rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin:1.5rem 0 2rem;}
     .hero-bio{font-size:1.05rem;line-height:1.75;color:var(--ink);max-width:520px;margin-bottom:3rem;}
     .hero-cta{display:flex;gap:1rem;flex-wrap:wrap;}
+    .hero-actions{display:flex;align-items:center;justify-content:space-between;gap:2rem;flex-wrap:wrap;}
     .btn-primary{display:inline-block;padding:.85rem 2rem;background:var(--accent);color:#111118;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;transition:background .2s;}
     .btn-primary:hover{background:var(--accent-soft);}
     .btn-outline{display:inline-block;padding:.85rem 2rem;border:1px solid var(--border-strong);color:var(--accent-soft);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;transition:all .2s;}
     .btn-outline:hover{background:var(--accent);color:#111118;}
-    .hero-side{position:relative;z-index:1;display:flex;justify-content:flex-end;align-self:stretch;align-items:center;}
-    /* Vitrine: prévias dos cards empilhadas; --u escala a composição inteira */
-    .hero-visual{--u:1px;position:relative;width:calc(var(--u)*440);max-width:100%;height:calc(var(--u)*480);}
-    .hero-stack{position:absolute;inset:0;}
-    .preview{position:absolute;top:calc(var(--u)*30);left:calc(var(--u)*110);width:calc(var(--u)*270);padding:calc(var(--u)*24);background:var(--surface);border:1px solid var(--border-strong);box-shadow:0 18px 40px -18px rgba(0,0,0,.65),0 2px 8px rgba(0,0,0,.25);transform:translate(calc(var(--u)*var(--x)),calc(var(--u)*var(--y))) rotate(var(--r));transition:transform .45s cubic-bezier(.2,.7,.2,1),border-color .25s;}
-    .preview:hover,.preview:focus-visible{border-color:var(--accent);outline:none;}
-    .hero-stack:hover .preview,.hero-stack:focus-within .preview{transform:translate(calc(var(--u)*var(--hx)),calc(var(--u)*var(--hy))) rotate(var(--hr));}
-    .preview .card-top{margin-bottom:1.1rem;}
-    .preview .card-title{font-size:1.45rem;margin-bottom:0;}
-    .hero-stats{position:absolute;right:0;bottom:0;background:var(--surface);border:1px solid var(--border);padding:1.25rem 1.75rem;display:flex;gap:2.25rem;z-index:5;}
+    .hero-stats{background:var(--surface);border:1px solid var(--border);padding:1.25rem 1.75rem;display:flex;gap:2.25rem;}
     .stat-item{text-align:center;}
     .stat-number{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:300;color:var(--ink);display:block;line-height:1;}
     .stat-label{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:.3rem;display:block;}
@@ -94,19 +86,15 @@
 
     @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
     .hero-text>*{animation:fadeUp .7s ease both;}
-    .hero-eyebrow{animation-delay:.1s;}.hero-name{animation-delay:.2s;}.hero-title{animation-delay:.3s;}.hero-bio{animation-delay:.4s;}.hero-cta{animation-delay:.5s;}
-    .hero-side{animation:fadeUp .9s .3s ease both;}
+    .hero-eyebrow{animation-delay:.1s;}.hero-name{animation-delay:.2s;}.hero-title{animation-delay:.3s;}.hero-bio{animation-delay:.4s;}.hero-actions{animation-delay:.5s;}
 
     @media(max-width:900px){
       nav{padding:1rem 1.5rem;}
       .nav-links{gap:1.25rem;}
-      .hero{grid-template-columns:1fr;padding:7rem 1.5rem 4rem;gap:2.5rem;min-height:auto;}
-      .hero::before{display:none;}
-      .hero-side{justify-content:center;}
-      .hero-visual{--u:.72px;height:calc(var(--u)*520);}
+      .hero{padding:7rem 1.5rem 4rem;min-height:auto;}
+      .hero-actions{gap:1.5rem;}
       .hero-stats{padding:1rem 1.4rem;gap:1.75rem;}
       .stat-number{font-size:2rem;}
-      .preview .card-title{font-size:1.1rem;}
       .section{padding:5rem 1.5rem;}
       .section-head{margin-bottom:2.5rem;}
       .search{width:100%;}
@@ -135,17 +123,14 @@
     <h1 class="hero-name">Portal de<br><em>criações</em></h1>
     <p class="hero-title">Frameworks · Ferramentas · Materiais</p>
     <p class="hero-bio">Frameworks, ferramentas e materiais interativos que desenvolvo para dar clareza, ritmo e escala ao trabalho de times de produto e design.</p>
-    <div class="hero-cta">
-      <a href="#criacoes" class="btn-primary">Ver criações</a>
-    </div>
-  </div>
-  <div class="hero-side">
-    <div class="hero-visual">
-      <div class="hero-stack" id="hero-stack" aria-label="Prévias das criações"></div>
-    <div class="hero-stats">
-      <div class="stat-item"><span class="stat-number" id="stat-items">—</span><span class="stat-label">Criações</span></div>
-      <div class="stat-item"><span class="stat-number" id="stat-tags">—</span><span class="stat-label">Categorias</span></div>
-    </div>
+    <div class="hero-actions">
+      <div class="hero-cta">
+        <a href="#criacoes" class="btn-primary">Ver criações</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item"><span class="stat-number" id="stat-items">—</span><span class="stat-label">Criações</span></div>
+        <div class="stat-item"><span class="stat-number" id="stat-tags">—</span><span class="stat-label">Categorias</span></div>
+      </div>
     </div>
   </div>
 </section>
@@ -248,33 +233,8 @@
             </div>
           </a>`).join("");
       }
-      renderStack();
       statItems.textContent = items.length;
       statTags.textContent = new Set(items.map(it => it.tag || "Criação")).size;
-    }
-
-    // Posições da vitrine: [repouso x, y, rotação] e [hover x, y, rotação]; a primeira fica na frente
-    const STACK_POS = [
-      { x: -16, y: 170, r: "-3deg", hx: -30, hy: 182, hr: "-5deg" },
-      { x: 36, y: 86, r: "4deg", hx: 64, hy: 82, hr: "7deg" },
-      { x: -52, y: 0, r: "-7deg", hx: -78, hy: -26, hr: "-11deg" },
-    ];
-    let stackDone = false;
-    function renderStack() {
-      if (stackDone) return;
-      stackDone = true;
-      const el = document.getElementById("hero-stack");
-      el.innerHTML = items.slice(0, STACK_POS.length).map((it, i) => {
-        const p = STACK_POS[i];
-        return `
-          <a class="preview" href="${encodeURI(it.file)}" style="--x:${p.x};--y:${p.y};--r:${p.r};--hx:${p.hx};--hy:${p.hy};--hr:${p.hr};z-index:${STACK_POS.length - i}">
-            <div class="card-top">
-              <span class="card-num">${String(i + 1).padStart(2, "0")}</span>
-              <span class="tag">${escapeHtml(it.tag || "Criação")}</span>
-            </div>
-            <h3 class="card-title">${escapeHtml(it.title)}</h3>
-          </a>`;
-      }).join("");
     }
 
     function applySearch() {
