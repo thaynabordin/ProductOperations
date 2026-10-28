@@ -14,20 +14,24 @@ Portal com minhas criações em Product Operations e DesignOps, publicado via Gi
 2. Pronto: a página inicial lista automaticamente todos os `.html` do repositório.
    - O título do card vem da tag `<title>` do arquivo.
    - A descrição vem de `<meta name="description" content="...">`.
-3. Se quiser controlar título, descrição, categoria ou ordem, adicione o arquivo ao array `CATALOG` no `index.html`:
+3. Se quiser controlar título, descrição, categoria, ordem ou a versão em inglês, adicione o arquivo ao array `CATALOG` no `index.html`:
 
 ```js
 const CATALOG = [
-  { file: "minha-criacao.html", title: "Minha criação", description: "Descrição curta.", tag: "DesignOps" },
+  { file: "minha-criacao.html", title: "Minha criação", description: "Descrição curta.", tag: "DesignOps",
+    en: { title: "My creation", description: "Short description." } },
 ];
 ```
 
-### Link “voltar ao início”
+## Layout padrão das criações
 
-Cole este trecho logo após a abertura do `<body>` de cada criação:
+Todas as criações seguem o mesmo layout do Guia de Práticas de Produto: cabeçalho fixo com "← Portal" e o seletor PT/EN, menu lateral, conteúdo ocupando a largura da tela e rodapé.
 
-```html
-<a href="./" style="position:fixed;top:16px;left:16px;z-index:9999;padding:.6rem 1.1rem;background:#111118;border:1px solid rgba(155,127,212,.3);color:#D4C4F0;font:400 .72rem/1 'DM Sans',system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;text-decoration:none">← Voltar ao início</a>
-```
+- O Canvas e o DesignOps × Product Ops usam a folha de estilos compartilhada `creations.css`. Uma criação nova pode usar o mesmo arquivo com `<link rel="stylesheet" href="creations.css">`.
+- O Guia tem os mesmos estilos dentro do próprio arquivo.
 
-(Para arquivos dentro de pastas, use `href="../"`.)
+### Idioma
+
+- A página inicial e as criações abrem no idioma de `?lang=pt` ou `?lang=en`.
+- Sem esse parâmetro, usam a última escolha salva no navegador e, na primeira visita, o idioma do navegador.
+- Os cards da página inicial levam o idioma para a criação, e o "← Portal" de cada criação volta no idioma atual.
