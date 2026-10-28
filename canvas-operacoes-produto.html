@@ -1,129 +1,82 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Canvas de Operações de Produto</title>
-  <meta name="description" content="Mapeie a saúde da operação de produto em 6 áreas, avalie cada uma e receba uma leitura de onde agir primeiro.">
-  <meta name="theme-color" content="#111118">
-  <style>
-    /* Paleta do portfólio (thaynabordin.github.io) */
-    :root{
-      --paper:#111118;--ink:#F0F0F0;--text-2:#A8A8C0;--muted:#6B6B85;--faint:#4A4A60;
-      --accent:#9B7FD4;--accent-soft:#D4C4F0;--surface:rgba(155,127,212,.04);
-      --border:rgba(155,127,212,.15);--border-strong:rgba(155,127,212,.3);
-      --mono:'Courier New',Courier,monospace;
-    }
-    *,*::before,*::after{box-sizing:border-box;}
-    html,body{margin:0;background:var(--paper);}
-    body{color:var(--ink);font-family:var(--mono);min-height:100vh;}
-    button{font-family:var(--mono);}
-    .app{min-height:100vh;position:relative;overflow:hidden;}
-    .grid-bg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
-    .layer{position:relative;z-index:1;}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canvas de Operações de Produto</title>
+<meta name="description" content="Mapeie a saúde da operação de produto em 6 áreas, avalie cada uma e receba uma leitura de onde agir primeiro.">
+<meta name="theme-color" content="#111118">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="creations.css">
+<style>
+  /* ---------- Específico do Canvas ---------- */
+  :root { --healthy: var(--good); --attention: var(--accent); --critical: var(--bad); }
 
-    .home-link{display:inline-block;margin:16px 16px 0;padding:6px 12px;font-size:12px;font-weight:700;letter-spacing:.15em;color:var(--accent-soft);text-decoration:none;border:1px solid var(--border-strong);border-radius:3px;}
-    .home-link:hover{background:rgba(155,127,212,.12);}
+  .area-card { display: flex; flex-direction: column; text-align: left; min-height: 210px; transition: background .2s, border-color .2s; }
+  .area-card:hover, .area-card:focus-visible { background: var(--surface-2); border-color: var(--accent-line); outline: none; }
+  .area-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .area-top .kicker { margin: 0; }
+  .area-card p { flex: 1; }
+  .area-foot { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); display: flex; justify-content: space-between; gap: 8px; }
+  .area-foot .note { color: var(--muted); }
 
-    header.head{border-bottom:1px solid var(--border);padding:28px 20px 32px;}
-    .wrap{max-width:640px;margin:0 auto;}
-    .corner{position:absolute;top:-10px;width:18px;height:18px;border-top:1.5px solid var(--border-strong);}
-    .corner.l{left:-10px;border-left:1.5px solid var(--border-strong);}
-    .corner.r{right:-10px;border-right:1.5px solid var(--border-strong);}
-    .lang{display:flex;justify-content:flex-end;margin-bottom:16px;}
-    .lang-box{display:flex;background:rgba(155,127,212,.06);border-radius:3px;overflow:hidden;border:1px solid var(--border);}
-    .lang-box button{padding:5px 14px;background:none;border:none;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.1em;}
-    .lang-box button+button{border-left:1px solid var(--border);}
-    .lang-box button.on{background:rgba(155,127,212,.15);color:var(--accent);}
-    h1{font-size:26px;font-weight:700;line-height:1.3;margin:0 0 10px;color:var(--ink);letter-spacing:.02em;}
-    .sub{font-size:15px;color:var(--text-2);line-height:1.6;max-width:420px;}
+  .progress { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .progress-label { font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+  .progress-track { flex: 1; min-width: 160px; height: 3px; background: var(--line-2); }
+  .progress-fill { height: 100%; background: var(--accent); transition: width .3s; }
 
-    .tabs{max-width:640px;margin:0 auto;display:flex;border-bottom:1px solid var(--border);}
-    .tabs button{flex:1;padding:14px;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.2em;}
-    .tabs button.on{border-bottom-color:var(--accent);color:var(--accent);}
+  .opt { text-align: center; padding: 28px 16px; border: 1px solid var(--line); background: var(--surface); transition: background .2s, border-color .2s; }
+  .opt:hover { border-color: var(--accent-line); }
+  .opt-sym { font-size: 28px; line-height: 1; color: var(--muted); margin-bottom: 10px; }
+  .opt-lbl { font-size: 13px; letter-spacing: .18em; text-transform: uppercase; color: var(--text-2); }
 
-    main{max-width:640px;margin:0 auto;padding:24px 16px 60px;}
-    .hint{font-size:13px;color:var(--muted);letter-spacing:.15em;margin-bottom:18px;text-align:center;}
-    .cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-    .card{background:var(--surface);border:1px dashed var(--border-strong);border-radius:3px;padding:18px 16px;cursor:pointer;text-align:left;position:relative;min-height:130px;display:flex;flex-direction:column;justify-content:space-between;transition:all .2s;color:inherit;}
-    .card:hover{border-color:var(--accent);}
-    .card-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
-    .code{font-size:12px;font-weight:700;letter-spacing:.15em;color:var(--muted);background:rgba(155,127,212,.08);padding:3px 7px;border-radius:2px;}
-    .card-title{font-size:15px;font-weight:700;color:var(--ink);line-height:1.35;margin-bottom:8px;}
-    .card-prompt{font-size:13px;color:var(--text-2);line-height:1.5;}
-    .card-status{margin-top:12px;font-size:12px;letter-spacing:.1em;font-weight:700;display:flex;align-items:center;gap:6px;}
-    .card-corner{position:absolute;bottom:7px;right:7px;width:10px;height:10px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
-    .count{margin-top:18px;font-size:12px;color:var(--muted);text-align:center;letter-spacing:.15em;}
-    .btn-main{width:100%;margin-top:16px;padding:14px;background:none;border:2px solid var(--accent);border-radius:3px;color:var(--accent);font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.12em;}
-    .btn-main:hover{background:rgba(155,127,212,.1);}
+  textarea.notes {
+    width: 100%; min-height: 120px; background: var(--surface); border: 1px solid var(--line-2); color: var(--text);
+    padding: 16px 18px; font-size: 16px; line-height: 1.6; resize: vertical; outline: none; border-radius: 0;
+  }
+  textarea.notes:focus { border-color: var(--accent); }
+  textarea.notes::placeholder { color: var(--muted); }
 
-    .detail{animation:fadeIn .2s ease;}
-    .back{background:none;border:none;color:var(--accent);font-size:14px;cursor:pointer;padding:0 0 20px;letter-spacing:.08em;}
-    .detail-head{border-bottom:1px solid var(--border);padding-bottom:22px;margin-bottom:24px;}
-    .detail-code{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.15em;color:var(--accent);background:rgba(155,127,212,.12);padding:4px 10px;border-radius:2px;margin-bottom:10px;}
-    h2{font-size:20px;font-weight:700;color:var(--ink);margin:0 0 8px;}
-    .desc{font-size:15px;color:var(--text-2);margin:0;line-height:1.7;}
-    .block{margin-bottom:28px;}
-    .label{font-size:12px;letter-spacing:.2em;color:var(--muted);margin-bottom:14px;font-weight:700;}
-    .q{font-size:15px;color:var(--text-2);line-height:1.6;padding:10px 0;border-bottom:1px dashed var(--border);display:flex;gap:12px;}
-    .q-num{color:var(--faint);min-width:20px;font-size:12px;padding-top:3px;font-weight:700;}
-    .opts{display:flex;gap:10px;}
-    .opt{flex:1;padding:16px 10px;background:var(--surface);border:1px dashed var(--border-strong);border-radius:3px;cursor:pointer;text-align:center;transition:all .2s;}
-    .opt-sym{font-size:22px;color:var(--faint);margin-bottom:6px;}
-    .opt-lbl{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.08em;}
-    textarea{width:100%;min-height:90px;background:var(--surface);border:1px dashed var(--border-strong);border-radius:3px;padding:14px 16px;color:var(--ink);font-size:15px;line-height:1.6;font-family:var(--mono);resize:vertical;outline:none;}
-    textarea:focus{border-color:var(--accent);}
-    textarea::placeholder{color:var(--faint);}
-    .btn-save{width:100%;padding:14px;background:none;border:1px solid var(--border-strong);border-radius:3px;color:var(--muted);font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.1em;}
-    .btn-save.ready{background:rgba(155,127,212,.1);border:2px solid var(--accent);color:var(--accent);}
-
-    .empty{text-align:center;padding:48px 20px;color:var(--muted);}
-    .empty .label{margin-bottom:18px;font-size:13px;}
-    .empty p{font-size:15px;line-height:1.7;margin:0 0 24px;color:var(--text-2);}
-    .btn-ghost{padding:12px 28px;background:none;border:1px dashed var(--border-strong);border-radius:3px;color:var(--accent);font-size:14px;cursor:pointer;letter-spacing:.12em;}
-    .summary{display:flex;margin-bottom:20px;border:1px solid var(--border);border-radius:3px;overflow:hidden;}
-    .summary > div{border-right:1px solid var(--border);padding:18px 12px;text-align:center;transition:flex .3s ease;}
-    .summary > div:last-child{border-right:none;}
-    .sum-n{font-size:30px;font-weight:800;line-height:1;margin-bottom:4px;}
-    .sum-l{font-size:12px;letter-spacing:.12em;font-weight:700;}
-    .bar{display:flex;height:8px;border-radius:2px;overflow:hidden;margin-bottom:28px;gap:3px;}
-    .bar > div{opacity:.8;border-radius:2px;}
-    .group{margin-bottom:22px;}
-    .group-head{font-size:12px;letter-spacing:.18em;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
-    .group-head .line{flex:1;height:1px;}
-    .row{background:var(--surface);padding:14px 16px;margin-bottom:8px;border-radius:0 3px 3px 0;}
-    .row-top{display:flex;align-items:center;gap:10px;}
-    .row-code{font-size:12px;font-weight:700;letter-spacing:.1em;opacity:.8;}
-    .row-title{font-size:16px;font-weight:700;color:var(--ink);}
-    .row-note{font-size:14px;color:var(--text-2);line-height:1.6;font-style:italic;padding-left:40px;margin-top:8px;white-space:pre-wrap;}
-    .reading{background:var(--surface);border:1px dashed var(--border-strong);border-radius:3px;padding:20px 18px;margin:8px 0 24px;}
-    .reading .label{color:var(--accent);margin-bottom:12px;}
-    .reading div:last-child{font-size:16px;color:var(--text-2);line-height:1.8;}
-    .btn-reset{width:100%;padding:13px;background:none;border:1px dashed var(--border);border-radius:3px;color:var(--muted);font-size:13px;cursor:pointer;letter-spacing:.12em;}
-    footer{text-align:center;padding:18px;border-top:1px solid var(--border);font-size:12px;color:var(--faint);letter-spacing:.12em;}
-    footer a{color:var(--muted);text-decoration:none;}
-    footer a:hover{color:var(--accent);}
-
-    @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
-    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
-  </style>
+  .summary-num { font-family: var(--serif); font-size: 56px; line-height: 1; margin-bottom: 6px; }
+  .summary-lbl { font-size: 13px; letter-spacing: .2em; text-transform: uppercase; }
+  .bar { display: flex; height: 4px; gap: 3px; margin: 16px 0 48px; }
+  .group-row { display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: baseline; padding: 16px 20px; margin-bottom: 8px; background: var(--surface); border: 1px solid var(--line); }
+  .group-row .code { font-size: 13px; letter-spacing: .16em; }
+  .group-row h5 { font-size: 16px; font-weight: 600; }
+  .group-row .row-note { grid-column: 2; font-family: var(--serif); font-style: italic; font-size: 18px; color: var(--text-2); white-space: pre-wrap; }
+  .empty { border-style: dashed; text-align: center; padding: 56px 24px; }
+  .empty .kicker { margin-bottom: 12px; }
+  .empty p { margin-bottom: 24px; }
+</style>
 </head>
 <body>
-<div class="app">
-  <svg class="grid-bg" aria-hidden="true">
-    <defs>
-      <pattern id="smallGrid" width="24" height="24" patternUnits="userSpaceOnUse">
-        <path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(155,127,212,0.05)" stroke-width="0.5"/>
-      </pattern>
-      <pattern id="grid" width="120" height="120" patternUnits="userSpaceOnUse">
-        <rect width="120" height="120" fill="url(#smallGrid)"/>
-        <path d="M 120 0 L 0 0 0 120" fill="none" stroke="rgba(155,127,212,0.1)" stroke-width="0.5"/>
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#grid)"/>
-  </svg>
-  <div class="layer" id="root"></div>
-</div>
+
+<header class="header">
+  <button class="menu-btn" id="menuBtn" aria-label="Abrir menu">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg>
+  </button>
+  <a class="home-link" id="homeLink" href="./">← Portal</a>
+  <div class="brand" id="brand"></div>
+  <div class="header-spacer"></div>
+  <div class="lang" role="group" aria-label="Idioma / Language">
+    <button type="button" data-lang="pt" aria-pressed="true">PT</button>
+    <button type="button" data-lang="en" aria-pressed="false">EN</button>
+  </div>
+</header>
+
+<nav class="sidebar" id="sidebar"></nav>
+<div class="overlay" id="overlay"></div>
+
+<main class="main">
+  <div class="content" id="content"></div>
+</main>
+
+<footer class="footer">
+  <span id="footNote"></span>
+  <span>Thayná Bordin · Product Ops &amp; DesignOps</span>
+</footer>
 
 <script>
 const AREAS = {
@@ -181,8 +134,7 @@ const AREAS = {
   ],
 };
 
-// Cores de status: tons suaves que harmonizam com a paleta do portfólio
-const HEALTH_COLORS = { healthy: "#D4C4F0", attention: "#9B7FD4", critical: "#E07A9A" };
+const HEALTH_COLORS = { healthy: "var(--healthy)", attention: "var(--attention)", critical: "var(--critical)" };
 const HEALTH_OPTIONS = {
   pt: [
     { value: "healthy", label: "Saudável", symbol: "●" },
@@ -191,25 +143,34 @@ const HEALTH_OPTIONS = {
   ],
   en: [
     { value: "healthy", label: "Healthy", symbol: "●" },
-    { value: "attention", label: "Needs Attention", symbol: "◐" },
+    { value: "attention", label: "Needs attention", symbol: "◐" },
     { value: "critical", label: "Critical", symbol: "○" },
   ],
 };
 
 const UI = {
   pt: {
-    home: "← PORTAL DE CRIAÇÕES",
-    title1: "CANVAS DE OPERAÇÕES", title2: "DE PRODUTO",
-    subtitle1: "Mapeie a saúde da operação em 6 áreas.", subtitle2: "Avalie. Anote. Identifique onde agir.",
-    tabCanvas: "CANVAS", tabReading: "LEITURA",
-    instruction: "— TOQUE EM UMA ÁREA PARA AVALIAR —",
-    mapped: "ÁREAS MAPEADAS", seeReading: "VER LEITURA COMPLETA →", back: "← VOLTAR",
-    diagnosticQ: "PERGUNTAS DIAGNÓSTICAS", assessment: "AVALIAÇÃO", notes: "ANOTAÇÕES",
-    notesPlaceholder: "Gargalos, observações, ideias...",
-    saveBack: "SALVAR E VOLTAR", backNoSave: "VOLTAR SEM AVALIAR",
-    insufficient: "DADOS INSUFICIENTES", insufficientDesc: "áreas restantes no canvas para gerar a leitura completa.",
-    goCanvas: "IR AO CANVAS", reading: "LEITURA", reset: "LIMPAR E RECOMEÇAR",
-    footer: "CANVAS DE OPERAÇÕES DE PRODUTO — POR THAYNÁ BORDIN", evaluate: "Avalie as",
+    docTitle: "Canvas de Operações de Produto",
+    brand: "Canvas de operações <em>de produto</em>",
+    home: "← Portal", homeNav: "Portal de criações", menu: "Abrir menu", nav: "Seções",
+    navOverview: "Visão geral", navCanvas: "Canvas", navAreas: "Áreas", navResult: "Resultado", navReading: "Leitura",
+    eyebrow: "Product Ops · Diagnóstico",
+    title: "Canvas de operações de <em>produto</em>",
+    lede: "Mapeie a saúde da operação em 6 áreas. Avalie, anote e identifique onde agir.",
+    areasHead: "As 6 áreas", areasHint: "Escolha uma área para avaliar",
+    evaluate: "Avaliar →", noted: "✎ com anotação",
+    mapped: "áreas mapeadas", seeReading: "Ver leitura completa →",
+    areaOf: (i, n) => `Área ${i} de ${n}`,
+    diagnosticQ: "Perguntas diagnósticas", assessment: "Avaliação", assessmentHint: "Como essa área está hoje?",
+    notes: "Anotações", notesPlaceholder: "Gargalos, observações, ideias...",
+    saveBack: "Salvar e voltar ao canvas", backNoSave: "Voltar sem avaliar",
+    prev: "← Anterior", next: "Próxima →",
+    readingEyebrow: "Resultado", readingTitle: "Leitura do <em>canvas</em>",
+    readingLede: "Como as 6 áreas se distribuem entre saudável, atenção e crítico, e por onde começar.",
+    insufficient: "Dados insuficientes",
+    insufficientDesc: n => `Avalie as ${n} áreas restantes no canvas para gerar a leitura completa.`,
+    goCanvas: "Ir ao canvas", reading: "Leitura", reset: "Limpar e recomeçar",
+    foot: "<em>Canvas de operações de produto</em> · por Thayná Bordin",
     interp: [
       "Mais da metade das áreas está em estado crítico. Antes de otimizar, estabilize. Comece por Governança e Processos — são a base que sustenta todo o resto.",
       "Existem áreas críticas que travam o restante da operação. Foque nelas primeiro — melhorias aqui destravam avanço nas outras dimensões.",
@@ -218,18 +179,27 @@ const UI = {
     ],
   },
   en: {
-    home: "← CREATIONS PORTAL",
-    title1: "PRODUCT OPERATIONS", title2: "CANVAS",
-    subtitle1: "Map your operation's health across 6 areas.", subtitle2: "Assess. Annotate. Identify where to act.",
-    tabCanvas: "CANVAS", tabReading: "READING",
-    instruction: "— TAP AN AREA TO ASSESS —",
-    mapped: "AREAS MAPPED", seeReading: "SEE FULL READING →", back: "← BACK",
-    diagnosticQ: "DIAGNOSTIC QUESTIONS", assessment: "ASSESSMENT", notes: "NOTES",
-    notesPlaceholder: "Bottlenecks, observations, ideas...",
-    saveBack: "SAVE AND GO BACK", backNoSave: "GO BACK WITHOUT SAVING",
-    insufficient: "INSUFFICIENT DATA", insufficientDesc: "remaining areas on the canvas to generate the full reading.",
-    goCanvas: "GO TO CANVAS", reading: "READING", reset: "CLEAR AND RESTART",
-    footer: "PRODUCT OPERATIONS CANVAS — BY THAYNÁ BORDIN", evaluate: "Assess the",
+    docTitle: "Product Operations Canvas",
+    brand: "Product operations <em>canvas</em>",
+    home: "← Portal", homeNav: "Creations portal", menu: "Open menu", nav: "Sections",
+    navOverview: "Overview", navCanvas: "Canvas", navAreas: "Areas", navResult: "Result", navReading: "Reading",
+    eyebrow: "Product Ops · Assessment",
+    title: "Product operations <em>canvas</em>",
+    lede: "Map your operation's health across 6 areas. Assess, annotate and identify where to act.",
+    areasHead: "The 6 areas", areasHint: "Pick an area to assess",
+    evaluate: "Assess →", noted: "✎ with notes",
+    mapped: "areas mapped", seeReading: "See full reading →",
+    areaOf: (i, n) => `Area ${i} of ${n}`,
+    diagnosticQ: "Diagnostic questions", assessment: "Assessment", assessmentHint: "How is this area doing today?",
+    notes: "Notes", notesPlaceholder: "Bottlenecks, observations, ideas...",
+    saveBack: "Save and back to canvas", backNoSave: "Back without assessing",
+    prev: "← Previous", next: "Next →",
+    readingEyebrow: "Result", readingTitle: "Canvas <em>reading</em>",
+    readingLede: "How the 6 areas split between healthy, needs attention and critical, and where to start.",
+    insufficient: "Insufficient data",
+    insufficientDesc: n => `Assess the ${n} remaining areas on the canvas to generate the full reading.`,
+    goCanvas: "Go to canvas", reading: "Reading", reset: "Clear and restart",
+    foot: "<em>Product operations canvas</em> · by Thayná Bordin",
     interp: [
       "More than half the areas are in critical condition. Before optimizing, stabilize. Start with Governance and Processes — they're the foundation that supports everything else.",
       "There are critical areas blocking the rest of the operation. Focus on them first — improvements here unlock progress across other dimensions.",
@@ -239,169 +209,229 @@ const UI = {
   },
 };
 
-const state = { lang: "pt", activeArea: null, health: {}, notes: {}, view: "canvas" };
-const root = document.getElementById("root");
+// Idioma: ?lang= no endereço, depois a última escolha salva no portal, depois o idioma do navegador
+function pickLang() {
+  const q = new URLSearchParams(location.search).get("lang");
+  if (q === "pt" || q === "en") return q;
+  try { const s = localStorage.getItem("portal-lang"); if (s === "pt" || s === "en") return s; } catch (e) {}
+  return (navigator.language || "pt").toLowerCase().startsWith("pt") ? "pt" : "en";
+}
 
+const state = { lang: pickLang(), view: "canvas", health: {}, notes: {} };
+const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const opts = () => HEALTH_OPTIONS[state.lang].map(o => ({ ...o, color: HEALTH_COLORS[o.value] }));
+const optOf = v => opts().find(o => o.value === v);
 
-function set(patch) { Object.assign(state, patch); render(); }
+function sidebarView(t, areas) {
+  const assessed = Object.keys(state.health).length;
+  const item = (go, num, label, extra = "") =>
+    `<button class="nav-item${state.view === go ? " active" : ""}" data-go="${go}"><span class="nav-num">${num}</span>${label}${extra}</button>`;
+  return `
+    <div class="nav-home"><a class="nav-item" href="./?lang=${state.lang}"><span class="nav-num">←</span>${t.homeNav}</a></div>
+    <div class="nav-group">
+      <div class="nav-label">${t.navOverview}</div>
+      ${item("canvas", "—", t.navCanvas)}
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">${t.navAreas}</div>
+      ${areas.map((a, i) => {
+        const o = state.health[a.id] && optOf(state.health[a.id]);
+        return item(a.id, String(i + 1).padStart(2, "0"), esc(a.label), o ? `<span class="nav-status" style="color:${o.color}">${o.symbol}</span>` : "");
+      }).join("")}
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">${t.navResult}</div>
+      ${item("reading", "→", t.navReading, `<span class="nav-status" style="color:var(--muted)">${assessed}/${areas.length}</span>`)}
+    </div>`;
+}
 
 function canvasView(t, areas) {
   const assessed = Object.keys(state.health).length;
   const cards = areas.map(a => {
-    const h = state.health[a.id];
-    const o = h && opts().find(x => x.value === h);
-    const cardStyle = o ? `background:${o.color}0D;border:1px solid ${o.color}66;` : "";
-    const codeStyle = o ? `color:${o.color};background:${o.color}22;` : "";
+    const o = state.health[a.id] && optOf(state.health[a.id]);
+    const style = o ? `style="border-top:1px solid ${o.color}"` : "";
     return `
-      <button class="card" data-area="${a.id}" style="${cardStyle}">
-        <div>
-          <div class="card-row">
-            <span class="code" style="${codeStyle}">${a.code}</span>
-            ${state.notes[a.id] ? '<span style="font-size:12px;color:var(--muted)">✎</span>' : ""}
-          </div>
-          <div class="card-title">${esc(a.label)}</div>
-          <div class="card-prompt">${esc(a.prompt)}</div>
+      <button class="card area-card" data-go="${a.id}" ${style}>
+        <div class="area-top">
+          <span class="kicker">${a.code}</span>
+          ${o ? `<span style="color:${o.color}">${o.symbol}</span>` : ""}
         </div>
-        ${o ? `<div class="card-status" style="color:${o.color}"><span style="font-size:14px">${o.symbol}</span>${o.label.toUpperCase()}</div>` : ""}
-        <div class="card-corner"></div>
+        <h4>${esc(a.label)}</h4>
+        <p>${esc(a.prompt)}</p>
+        <div class="area-foot">
+          ${o ? `<span style="color:${o.color}">${o.label}</span>` : `<span>${t.evaluate}</span>`}
+          ${state.notes[a.id] ? `<span class="note">${t.noted}</span>` : ""}
+        </div>
       </button>`;
   }).join("");
   return `
-    <div class="hint">${t.instruction}</div>
-    <div class="cards">${cards}</div>
-    ${assessed > 0 ? `<div class="count">${assessed}/${areas.length} ${t.mapped}</div>` : ""}
-    ${assessed === areas.length ? `<button class="btn-main" data-view="overview">${t.seeReading}</button>` : ""}`;
-}
-
-function detailView(t, area) {
-  const current = state.health[area.id];
-  const options = opts().map(o => {
-    const sel = current === o.value;
-    const st = sel ? `background:${o.color}1F;border:2px solid ${o.color};` : "";
-    return `
-      <button class="opt" data-health="${o.value}" style="${st}">
-        <div class="opt-sym" style="${sel ? `color:${o.color}` : ""}">${o.symbol}</div>
-        <div class="opt-lbl" style="${sel ? `color:${o.color}` : ""}">${o.label.toUpperCase()}</div>
-      </button>`;
-  }).join("");
-  return `
-    <div class="detail">
-      <button class="back" data-close>${t.back}</button>
-      <div class="detail-head">
-        <span class="detail-code">${area.code}</span>
-        <h2>${esc(area.label)}</h2>
-        <p class="desc">${esc(area.description)}</p>
+    <div class="eyebrow">${t.eyebrow}</div>
+    <h1 class="title display">${t.title}</h1>
+    <p class="lede">${t.lede}</p>
+    <div class="block">
+      <div class="block-head"><h2>${t.areasHead}</h2><span>${t.areasHint}</span></div>
+      <div class="grid g3">${cards}</div>
+    </div>
+    <div class="block">
+      <div class="progress">
+        <span class="progress-label">${assessed}/${areas.length} ${t.mapped}</span>
+        <div class="progress-track"><div class="progress-fill" style="width:${(assessed / areas.length) * 100}%"></div></div>
+        ${assessed === areas.length ? `<button class="btn primary" data-go="reading">${t.seeReading}</button>` : ""}
       </div>
-      <div class="block">
-        <div class="label">${t.diagnosticQ}</div>
-        ${area.questions.map((q, i) => `<div class="q"><span class="q-num">${String(i + 1).padStart(2, "0")}</span><span>${esc(q)}</span></div>`).join("")}
-      </div>
-      <div class="block">
-        <div class="label">${t.assessment}</div>
-        <div class="opts">${options}</div>
-      </div>
-      <div class="block">
-        <div class="label">${t.notes}</div>
-        <textarea id="notes" placeholder="${esc(t.notesPlaceholder)}">${esc(state.notes[area.id] || "")}</textarea>
-      </div>
-      <button class="btn-save ${current ? "ready" : ""}" data-close>${current ? t.saveBack : t.backNoSave}</button>
     </div>`;
 }
 
-function overviewView(t, areas) {
-  const assessed = Object.keys(state.health).length;
-  if (assessed < areas.length) {
+function areaView(t, areas, idx) {
+  const a = areas[idx];
+  const current = state.health[a.id];
+  const prev = areas[idx - 1], next = areas[idx + 1];
+  const options = opts().map(o => {
+    const sel = current === o.value;
+    const st = sel ? `style="border-color:${o.color};background:var(--accent-soft)"` : "";
     return `
-      <div class="empty">
-        <div class="label">${t.insufficient}</div>
-        <p>${t.evaluate} ${areas.length - assessed} ${t.insufficientDesc}</p>
-        <button class="btn-ghost" data-view="canvas">${t.goCanvas}</button>
+      <button class="opt" data-health="${o.value}" aria-pressed="${sel}" ${st}>
+        <div class="opt-sym" style="${sel ? `color:${o.color}` : ""}">${o.symbol}</div>
+        <div class="opt-lbl" style="${sel ? `color:${o.color}` : ""}">${o.label}</div>
+      </button>`;
+  }).join("");
+  return `
+    <div class="eyebrow">${a.code} · ${t.areaOf(idx + 1, areas.length)}</div>
+    <h1 class="title">${esc(a.label)}</h1>
+    <p class="lede">${esc(a.description)}</p>
+    <div class="block">
+      <div class="block-head"><h2>${t.diagnosticQ}</h2></div>
+      <div class="card"><div class="steps">
+        ${a.questions.map((q, i) => `<div class="step"><span class="step-n">${String(i + 1).padStart(2, "0")}</span><p>${esc(q)}</p></div>`).join("")}
+      </div></div>
+    </div>
+    <div class="block">
+      <div class="block-head"><h2>${t.assessment}</h2><span>${t.assessmentHint}</span></div>
+      <div class="grid g3">${options}</div>
+    </div>
+    <div class="block">
+      <div class="block-head"><h2>${t.notes}</h2></div>
+      <textarea class="notes" id="notes" placeholder="${esc(t.notesPlaceholder)}">${esc(state.notes[a.id] || "")}</textarea>
+    </div>
+    <div class="actions">
+      <button class="btn ${current ? "primary" : "ghost"}" data-go="canvas">${current ? t.saveBack : t.backNoSave}</button>
+    </div>
+    <div class="pager">
+      ${prev ? `<button class="prev" data-go="${prev.id}"><small>${t.prev}</small><span>${esc(prev.label)}</span></button>` : ""}
+      ${next ? `<button class="next" data-go="${next.id}"><small>${t.next}</small><span>${esc(next.label)}</span></button>`
+             : `<button class="next" data-go="reading"><small>${t.next}</small><span>${t.navReading}</span></button>`}
+    </div>`;
+}
+
+function readingView(t, areas) {
+  const assessed = Object.keys(state.health).length;
+  const head = `
+    <div class="eyebrow">${t.readingEyebrow}</div>
+    <h1 class="title">${t.readingTitle}</h1>
+    <p class="lede">${t.readingLede}</p>`;
+  if (assessed < areas.length) {
+    return head + `
+      <div class="card empty">
+        <div class="kicker">${t.insufficient}</div>
+        <p>${t.insufficientDesc(areas.length - assessed)}</p>
+        <button class="btn" data-go="canvas">${t.goCanvas}</button>
       </div>`;
   }
-  const vals = Object.values(state.health);
   const sum = { healthy: 0, attention: 0, critical: 0 };
-  vals.forEach(v => sum[v]++);
+  Object.values(state.health).forEach(v => sum[v]++);
   const interp = sum.critical >= 3 ? t.interp[0] : sum.critical >= 1 ? t.interp[1] : sum.attention >= 3 ? t.interp[2] : t.interp[3];
   const o = opts();
-
   const summary = o.map(x => `
-    <div style="flex:${sum[x.value] || 0.3};background:${x.color}14">
-      <div class="sum-n" style="color:${x.color}">${sum[x.value]}</div>
-      <div class="sum-l" style="color:${x.color}">${x.label.toUpperCase()}</div>
+    <div class="card" style="border-top:1px solid ${x.color}">
+      <div class="summary-num" style="color:${x.color}">${sum[x.value]}</div>
+      <div class="summary-lbl" style="color:${x.color}">${x.symbol} ${x.label}</div>
     </div>`).join("");
   const bar = o.filter(x => sum[x.value]).map(x => `<div style="flex:${sum[x.value]};background:${x.color}"></div>`).join("");
   const groups = ["critical", "attention", "healthy"].map(hv => {
     const list = areas.filter(a => state.health[a.id] === hv);
     if (!list.length) return "";
-    const x = o.find(y => y.value === hv);
+    const x = optOf(hv);
     return `
-      <div class="group">
-        <div class="group-head" style="color:${x.color}"><span style="font-size:14px">${x.symbol}</span>${x.label.toUpperCase()}<span class="line" style="background:${x.color}40"></span></div>
+      <div class="block">
+        <div class="block-head"><h2 style="color:${x.color}">${x.symbol} ${x.label}</h2></div>
         ${list.map(a => `
-          <div class="row" style="border-left:3px solid ${x.color}">
-            <div class="row-top"><span class="row-code" style="color:${x.color}">${a.code}</span><span class="row-title">${esc(a.label)}</span></div>
-            ${state.notes[a.id] ? `<div class="row-note">${esc(state.notes[a.id])}</div>` : ""}
+          <div class="group-row" style="border-left:2px solid ${x.color}">
+            <span class="code" style="color:${x.color}">${a.code}</span>
+            <h5>${esc(a.label)}</h5>
+            ${state.notes[a.id] ? `<p class="row-note">${esc(state.notes[a.id])}</p>` : ""}
           </div>`).join("")}
       </div>`;
   }).join("");
-
-  return `
-    <div class="summary">${summary}</div>
+  return head + `
+    <div class="grid g3">${summary}</div>
     <div class="bar">${bar}</div>
     ${groups}
-    <div class="reading"><div class="label">${t.reading}</div><div>${interp}</div></div>
-    <button class="btn-reset" data-reset>${t.reset}</button>`;
+    <div class="block">
+      <div class="kicker">${t.reading}</div>
+      <p class="quote">${interp}</p>
+    </div>
+    <div class="actions"><button class="btn ghost" data-reset>${t.reset}</button></div>`;
 }
 
+let lastView = null;
 function render() {
   const t = UI[state.lang];
   const areas = AREAS[state.lang];
-  const assessed = Object.keys(state.health).length;
-  const area = state.activeArea && areas.find(a => a.id === state.activeArea);
+  const idx = areas.findIndex(a => a.id === state.view);
   document.documentElement.lang = state.lang === "pt" ? "pt-BR" : "en";
-
-  let body;
-  if (state.view === "overview") body = overviewView(t, areas);
-  else body = area ? detailView(t, area) : canvasView(t, areas);
-
-  root.innerHTML = `
-    <a class="home-link" href="./">${t.home}</a>
-    <header class="head">
-      <div class="wrap" style="position:relative">
-        <div class="corner l"></div><div class="corner r"></div>
-        <div class="lang"><div class="lang-box">
-          ${["pt", "en"].map(l => `<button data-lang="${l}" class="${state.lang === l ? "on" : ""}">${l.toUpperCase()}</button>`).join("")}
-        </div></div>
-        <h1>${t.title1}<br>${t.title2}</h1>
-        <div class="sub">${t.subtitle1}<br>${t.subtitle2}</div>
-      </div>
-    </header>
-    <nav class="tabs">
-      <button data-view="canvas" class="${state.view === "canvas" ? "on" : ""}">${t.tabCanvas}</button>
-      <button data-view="overview" class="${state.view === "overview" ? "on" : ""}">${t.tabReading}${assessed === areas.length ? "" : ` [${assessed}/6]`}</button>
-    </nav>
-    <main>${body}</main>
-    <footer><a href="./">${t.footer}</a></footer>`;
+  document.title = t.docTitle;
+  $("brand").innerHTML = t.brand;
+  $("homeLink").textContent = t.home;
+  $("homeLink").href = "./?lang=" + state.lang;
+  $("footNote").innerHTML = t.foot;
+  $("menuBtn").setAttribute("aria-label", t.menu);
+  $("sidebar").setAttribute("aria-label", t.nav);
+  document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === state.lang)));
+  $("sidebar").innerHTML = sidebarView(t, areas);
+  const body = state.view === "reading" ? readingView(t, areas) : idx >= 0 ? areaView(t, areas, idx) : canvasView(t, areas);
+  // A animação de entrada só roda ao trocar de seção, não a cada resposta
+  const animate = state.view !== lastView;
+  lastView = state.view;
+  $("content").innerHTML = `<div class="${animate ? "view" : ""}">${body}</div>`;
 }
 
-root.addEventListener("click", e => {
-  const el = e.target.closest("button");
-  if (!el) return;
-  if (el.dataset.lang) set({ lang: el.dataset.lang });
-  else if (el.dataset.view) set({ view: el.dataset.view, activeArea: null });
-  else if (el.dataset.area) { set({ activeArea: el.dataset.area }); scrollTo(0, 0); }
-  else if (el.dataset.health) set({ health: { ...state.health, [state.activeArea]: el.dataset.health } });
-  else if ("close" in el.dataset) set({ activeArea: null });
-  else if ("reset" in el.dataset) set({ health: {}, notes: {}, activeArea: null, view: "canvas" });
+function go(view) {
+  state.view = view;
+  document.body.classList.remove("nav-open");
+  render();
+  window.scrollTo({ top: 0, behavior: "auto" });
+}
+
+function setLang(next) {
+  if (next === state.lang) return;
+  state.lang = next;
+  try { localStorage.setItem("portal-lang", next); } catch (e) {}
+  const url = new URL(location.href);
+  url.searchParams.set("lang", next);
+  history.replaceState(null, "", url);
+  render();
+}
+
+document.addEventListener("click", e => {
+  const l = e.target.closest(".lang button");
+  if (l) { setLang(l.dataset.lang); return; }
+  const g = e.target.closest("[data-go]");
+  if (g) { go(g.dataset.go); return; }
+  const h = e.target.closest("[data-health]");
+  if (h) {
+    const areas = AREAS[state.lang];
+    if (areas.some(a => a.id === state.view)) { state.health = { ...state.health, [state.view]: h.dataset.health }; render(); }
+    return;
+  }
+  if (e.target.closest("[data-reset]")) { state.health = {}; state.notes = {}; go("canvas"); }
 });
+$("brand").addEventListener("click", () => go("canvas"));
+$("menuBtn").addEventListener("click", () => document.body.classList.toggle("nav-open"));
+$("overlay").addEventListener("click", () => document.body.classList.remove("nav-open"));
 
 // Anotações são salvas sem re-renderizar, para não perder o foco do campo
-root.addEventListener("input", e => {
-  if (e.target.id === "notes" && state.activeArea) {
-    state.notes = { ...state.notes, [state.activeArea]: e.target.value };
-  }
+document.addEventListener("input", e => {
+  if (e.target.id === "notes") state.notes = { ...state.notes, [state.view]: e.target.value };
 });
 
 render();

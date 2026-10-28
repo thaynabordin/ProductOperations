@@ -1,305 +1,480 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DesignOps × Product Ops — Modelo de Convergência</title>
-  <meta name="description" content="Modelo interativo para avaliar o nível de convergência entre DesignOps e Product Ops na sua organização, em 6 dimensões.">
-  <meta name="theme-color" content="#111118">
-  <style>
-    /* Paleta do portfólio (thaynabordin.github.io) */
-    :root{
-      --paper:#111118;--deep:#16161f;--surface:#1e1e2e;--ink:#F0F0F0;--text-2:#A8A8C0;--muted:#6B6B85;--faint:#4A4A60;
-      --accent:#9B7FD4;--accent-soft:#D4C4F0;--rose:#E07A9A;
-      --border:rgba(155,127,212,.15);--border-strong:rgba(155,127,212,.3);
-    }
-    *,*::before,*::after{box-sizing:border-box;}
-    html,body{margin:0;background:var(--paper);}
-    body{color:var(--ink);font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;min-height:100vh;overflow-x:hidden;}
-    button{font-family:inherit;}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DesignOps × Product Ops — Modelo de Convergência</title>
+<meta name="description" content="Modelo interativo para avaliar o nível de convergência entre DesignOps e Product Ops na sua organização, em 6 dimensões.">
+<meta name="theme-color" content="#111118">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="creations.css">
+<style>
+  /* ---------- Específico do DesignOps × Product Ops ---------- */
+  .dim-head h2 .icon { font-family: var(--sans); font-size: 22px; margin-right: 6px; }
+  .lvl-badge { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; padding: 4px 10px; border: 1px solid currentColor; }
 
-    header.head{background:linear-gradient(135deg,var(--paper) 0%,var(--deep) 40%,var(--surface) 100%);border-bottom:1px solid var(--border-strong);padding:20px 24px 28px;position:relative;overflow:hidden;}
-    .glow1{position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(155,127,212,.18) 0%,transparent 70%);}
-    .glow2{position:absolute;bottom:-40px;left:-40px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(224,122,154,.08) 0%,transparent 70%);}
-    .wrap{position:relative;z-index:1;max-width:640px;margin:0 auto;}
-    .home-link{display:inline-block;margin-bottom:20px;font-size:14px;font-weight:600;letter-spacing:.04em;color:var(--text-2);text-decoration:none;}
-    .home-link:hover{color:var(--accent-soft);}
-    .pill{display:inline-block;background:rgba(155,127,212,.15);border:1px solid rgba(155,127,212,.4);border-radius:20px;padding:4px 14px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-soft);margin-bottom:14px;font-weight:600;}
-    h1{font-size:26px;font-weight:800;line-height:1.15;margin:0 0 8px;background:linear-gradient(135deg,var(--ink) 30%,var(--accent-soft) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--ink);}
-    .head-sub{font-size:16px;font-weight:400;color:var(--text-2);margin:0;line-height:1.5;}
+  .opt { display: flex; gap: 14px; align-items: flex-start; text-align: left; padding: 18px 20px; border: 1px solid var(--line); background: var(--surface); color: var(--text-2); font-size: 16px; line-height: 1.5; transition: background .2s, border-color .2s, color .2s; }
+  .opt:hover { border-color: var(--accent-line); }
+  .opt.sel { color: var(--text); background: var(--accent-soft); }
+  .opt .lvl { flex-shrink: 0; width: 28px; height: 28px; border: 1px solid var(--line-2); display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-size: 18px; color: var(--muted); }
 
-    .tabs{display:flex;max-width:640px;margin:0 auto;border-bottom:1px solid var(--border);}
-    .tabs button{flex:1;padding:14px 16px;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-size:15px;font-weight:600;cursor:pointer;letter-spacing:.03em;transition:all .2s;}
-    .tabs button.on{border-bottom-color:var(--accent);color:var(--ink);}
+  .progress { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .progress-label { font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+  .progress-track { flex: 1; min-width: 160px; height: 3px; background: var(--line-2); }
+  .progress-fill { height: 100%; background: var(--accent); transition: width .3s; }
 
-    main{max-width:640px;margin:0 auto;padding:20px 16px 40px;}
-    .intro{font-size:15px;color:var(--text-2);line-height:1.7;margin:0 0 24px;}
+  .k-design { color: var(--bad); }
+  .k-product { color: var(--accent-2); }
+  .card.conv { border-top: 1px solid var(--accent); background: linear-gradient(180deg, var(--accent-soft), var(--surface) 70%); }
+  .card.conv p { color: var(--text); }
 
-    /* Modelo */
-    .dim{background:rgba(155,127,212,.03);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:10px;cursor:pointer;transition:all .25s ease;width:100%;text-align:left;color:inherit;display:block;}
-    .dim.open{background:linear-gradient(135deg,rgba(155,127,212,.12) 0%,rgba(30,30,46,.6) 100%);border-color:rgba(155,127,212,.4);}
-    .dim-head{display:flex;align-items:center;gap:12px;}
-    .dim-icon{font-size:22px;}
-    .dim-label{font-size:16px;font-weight:700;flex:1;}
-    .chev{font-size:18px;color:var(--muted);transition:transform .2s;}
-    .dim.open .chev{transform:rotate(180deg);}
-    .dim-body{margin-top:16px;}
-    .pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
-    .box{border-radius:8px;padding:12px;}
-    .box-t{font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:6px;}
-    .box-d{font-size:14px;color:var(--text-2);line-height:1.5;}
-    .box.design{background:rgba(224,122,154,.08);border:1px solid rgba(224,122,154,.22);}
-    .box.design .box-t{color:var(--rose);}
-    .box.product{background:rgba(212,196,240,.06);border:1px solid rgba(212,196,240,.2);}
-    .box.product .box-t{color:var(--accent-soft);}
-    .box.conv{background:rgba(155,127,212,.1);border:1px solid rgba(155,127,212,.28);}
-    .box.conv .box-t{color:var(--accent);}
-    .box.conv .box-d{color:var(--ink);line-height:1.6;}
+  .score-card { display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: center; padding: 36px; }
+  .score-num { font-family: var(--serif); font-size: 96px; line-height: .9; }
+  .score-of { font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-top: 16px; }
+  .score-card h4 { font-size: 36px; }
+  .res-row { display: grid; grid-template-columns: 32px 1fr 200px 28px; gap: 16px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .res-row:last-child { border-bottom: 0; }
+  .res-row .icon { font-size: 18px; }
+  .res-row .label { font-size: 16px; color: var(--text-2); }
+  .track { height: 4px; background: var(--line-2); }
+  .fill { height: 100%; transition: width .5s ease; }
+  .res-n { font-family: var(--serif); font-size: 24px; text-align: right; }
+  .empty { border-style: dashed; text-align: center; padding: 56px 24px; }
+  .empty .kicker { margin-bottom: 12px; }
+  .empty p { margin-bottom: 24px; }
 
-    /* Diagnóstico */
-    .q-block{margin-bottom:24px;}
-    .q-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-    .q-head .ic{font-size:18px;}
-    .q-title{font-size:15px;font-weight:700;color:var(--ink);}
-    .lvl-badge{margin-left:auto;font-size:12px;padding:2px 8px;border-radius:10px;font-weight:700;white-space:nowrap;}
-    .opts{display:flex;flex-direction:column;gap:6px;}
-    .opt{background:rgba(155,127,212,.02);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text-2);font-size:14px;line-height:1.5;cursor:pointer;text-align:left;transition:all .2s;display:flex;align-items:flex-start;gap:10px;}
-    .opt:hover{border-color:var(--border-strong);}
-    .opt.sel{color:var(--ink);}
-    .dot{width:20px;height:20px;min-width:20px;border-radius:50%;border:2px solid rgba(155,127,212,.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:transparent;transition:all .2s;margin-top:1px;}
-    .opt.sel .dot{color:var(--paper);}
-    .cta{width:100%;padding:16px;background:var(--accent);border:none;border-radius:12px;color:var(--paper);font-size:16px;font-weight:700;cursor:pointer;margin-top:8px;letter-spacing:.02em;box-shadow:0 4px 20px rgba(155,127,212,.25);transition:background .2s;}
-    .cta:hover{background:var(--accent-soft);}
-    .progress{font-size:13px;color:var(--muted);text-align:center;letter-spacing:.06em;margin-top:4px;}
-
-    /* Resultado */
-    .hero-score{background:linear-gradient(135deg,rgba(155,127,212,.15) 0%,rgba(30,30,46,.5) 100%);border:1px solid var(--border-strong);border-radius:16px;padding:28px 24px;text-align:center;margin-bottom:24px;}
-    .score-dot{width:22px;height:22px;border-radius:50%;margin:0 auto 12px;}
-    .score{font-size:44px;font-weight:900;line-height:1;margin-bottom:4px;}
-    .score-of{font-size:12px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;}
-    .score-label{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:6px;}
-    .score-desc{font-size:15px;color:var(--text-2);line-height:1.5;}
-    h3{font-size:15px;font-weight:700;color:var(--ink);margin:0 0 14px;letter-spacing:.03em;}
-    .res-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(155,127,212,.08);}
-    .res-row .ic{font-size:16px;}
-    .res-label{font-size:14px;flex:1;color:var(--text-2);}
-    .track{width:100px;height:6px;background:rgba(155,127,212,.1);border-radius:3px;overflow:hidden;}
-    .fill{height:100%;border-radius:3px;transition:width .5s ease;}
-    .res-n{font-size:15px;font-weight:800;min-width:18px;text-align:right;}
-    .next{background:rgba(155,127,212,.03);border:1px solid var(--border);border-radius:12px;padding:18px;margin:24px 0 20px;}
-    .next h3{margin-bottom:12px;}
-    .step{padding:10px 12px;background:rgba(155,127,212,.08);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:14px;line-height:1.6;color:var(--text-2);}
-    .step strong{color:var(--accent-soft);}
-    .good{font-size:14px;color:var(--text-2);line-height:1.6;}
-    .reset{width:100%;padding:14px;background:rgba(155,127,212,.05);border:1px solid var(--border-strong);border-radius:10px;color:var(--text-2);font-size:15px;font-weight:600;cursor:pointer;}
-    .reset:hover{color:var(--ink);}
-
-    footer{text-align:center;padding:16px;border-top:1px solid rgba(155,127,212,.08);font-size:13px;color:var(--faint);}
-    footer a{color:var(--muted);text-decoration:none;}
-    footer a:hover{color:var(--accent-soft);}
-
-    @media(max-width:420px){.pair{grid-template-columns:1fr;}}
-    @media(prefers-reduced-motion:reduce){*{transition:none!important;}}
-  </style>
+  @media (max-width: 640px) {
+    .score-card { grid-template-columns: 1fr; gap: 16px; padding: 28px 24px; }
+    .score-num { font-size: 72px; }
+    .res-row { grid-template-columns: 28px 1fr 28px; }
+    .res-row .track { grid-column: 2 / 4; grid-row: 2; }
+  }
+</style>
 </head>
 <body>
-<header class="head">
-  <div class="glow1"></div><div class="glow2"></div>
-  <div class="wrap">
-    <a class="home-link" href="./">← Portal de criações</a><br>
-    <div class="pill">Modelo Interativo</div>
-    <h1>DesignOps × Product Ops</h1>
-    <p class="head-sub">Avalie o nível de convergência entre as duas disciplinas na sua organização</p>
+
+<header class="header">
+  <button class="menu-btn" id="menuBtn" aria-label="Abrir menu">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg>
+  </button>
+  <a class="home-link" id="homeLink" href="./">← Portal</a>
+  <div class="brand" id="brand"></div>
+  <div class="header-spacer"></div>
+  <div class="lang" role="group" aria-label="Idioma / Language">
+    <button type="button" data-lang="pt" aria-pressed="true">PT</button>
+    <button type="button" data-lang="en" aria-pressed="false">EN</button>
   </div>
 </header>
 
-<nav class="tabs" id="tabs">
-  <button data-tab="assess" class="on">Diagnóstico</button>
-  <button data-tab="framework">Modelo</button>
-</nav>
+<nav class="sidebar" id="sidebar"></nav>
+<div class="overlay" id="overlay"></div>
 
-<main id="main"></main>
+<main class="main">
+  <div class="content" id="content"></div>
+</main>
 
-<footer><a href="./">DesignOps × Product Ops — Modelo de Convergência — por Thayná Bordin</a></footer>
+<footer class="footer">
+  <span id="footNote"></span>
+  <span>Thayná Bordin · Product Ops &amp; DesignOps</span>
+</footer>
 
 <script>
-const DIMENSIONS = [
-  { id: "rituals", label: "Rituais & Cerimônias", icon: "🔄",
-    designOps: "Críticas de design, Alinhamentos de sistema de design, Revisões de entrega",
-    productOps: "Revisões de ciclo, Acompanhamento de objetivos, Alinhamentos de portfólio",
-    convergence: "Cerimônias integradas onde decisões de design e produto acontecem juntas, eliminando entregas fragmentadas",
-    questions: [
-      { text: "Rituais de design e produto são separados e desconectados", level: 1 },
-      { text: "Existe alguma sobreposição, mas cada área mantém seus próprios rituais", level: 2 },
-      { text: "Rituais compartilhados existem, com cadência definida e participação cruzada", level: 3 },
-      { text: "Cerimônias são integradas intencionalmente, com governança unificada e ciclos de retorno claros", level: 4 },
-    ] },
-  { id: "tooling", label: "Ferramentas & Infraestrutura", icon: "🛠️",
-    designOps: "Editores visuais, Tokens de design, Bibliotecas de componentes, Documentação de design",
-    productOps: "Gestão de backlog, Visão de portfólio, Priorização, Análise de dados",
-    convergence: "Ecossistema integrado onde métricas de design (adoção, consistência) alimentam decisões de produto e vice-versa",
-    questions: [
-      { text: "Ferramentas completamente isoladas, sem integração entre design e produto", level: 1 },
-      { text: "Algumas integrações pontuais existem, mas não são sistêmicas", level: 2 },
-      { text: "Ferramentas conectadas com fluxos automatizados e painéis compartilhados", level: 3 },
-      { text: "Ecossistema unificado com fonte única de verdade para decisões entre disciplinas", level: 4 },
-    ] },
-  { id: "metrics", label: "Métricas & Resultados", icon: "📊",
-    designOps: "Adoção do sistema de design, Índice de consistência, Débito de experiência",
-    productOps: "Progresso de objetivos, Adoção de funcionalidades, Tempo até o mercado",
-    convergence: "Modelo de métricas compartilhado onde indicadores de experiência e produto se complementam para medir valor real",
-    questions: [
-      { text: "Cada área tem métricas próprias que não conversam entre si", level: 1 },
-      { text: "Algumas métricas são compartilhadas, mas sem modelo estruturado", level: 2 },
-      { text: "Modelo de métricas integrado com indicadores antecedentes e consequentes conectados", level: 3 },
-      { text: "Métricas de experiência e produto formam um sistema coeso orientado a resultados de negócio", level: 4 },
-    ] },
-  { id: "governance", label: "Governança & Decisão", icon: "⚖️",
-    designOps: "Revisões de design, Governança de marca, Responsabilidade sobre componentes",
-    productOps: "Priorização de roteiro, Planejamento de capacidade, Caminhos de escalação",
-    convergence: "Modelo de governança unificado onde as trocas entre qualidade de experiência e velocidade são explícitas e bem gerenciadas",
-    questions: [
-      { text: "Decisões de design e produto acontecem isoladas, gerando conflitos frequentes", level: 1 },
-      { text: "Existe comunicação entre as áreas, mas sem modelo formal de co-decisão", level: 2 },
-      { text: "Governança compartilhada com papéis claros e critérios de decisão definidos", level: 3 },
-      { text: "Modelo de decisão integrado com trocas explícitas e responsabilidade compartilhada", level: 4 },
-    ] },
-  { id: "enablement", label: "Capacitação & Conhecimento", icon: "🧠",
-    designOps: "Integração de designers, Diretrizes, Guias práticos de design",
-    productOps: "Integração de gestores de produto, Modelos, Guias práticos de produto",
-    convergence: "Base de conhecimento unificada que capacita tanto gestores de produto quanto designers a operar de forma autônoma e alinhada",
-    questions: [
-      { text: "Cada área tem seus próprios materiais sem padronização ou compartilhamento", level: 1 },
-      { text: "Materiais parcialmente compartilhados, mas sem estratégia de capacitação integrada", level: 2 },
-      { text: "Guias e diretrizes unificados com programa de capacitação entre áreas", level: 3 },
-      { text: "Organização que aprende, onde conhecimento flui naturalmente entre design e produto", level: 4 },
-    ] },
-  { id: "community", label: "Comunidade & Cultura", icon: "🌱",
-    designOps: "Comunidade de prática de design, Mentoria, Palestras de design",
-    productOps: "Comunidade de gestores de produto, Guildas, Sessões de troca",
-    convergence: "Comunidade integrada onde designers e gestores de produto co-criam práticas e compartilham aprendizados continuamente",
-    questions: [
-      { text: "Comunidades isoladas sem interação entre design e produto", level: 1 },
-      { text: "Interações pontuais existem, mas não há comunidade entre áreas estruturada", level: 2 },
-      { text: "Comunidade de prática conjunta com eventos regulares e responsabilidade compartilhada", level: 3 },
-      { text: "Cultura de colaboração orgânica onde as fronteiras entre operações de design e produto são fluidas", level: 4 },
-    ] },
-];
+const DIMENSIONS = {
+  pt: [
+    { id: "rituals", label: "Rituais & Cerimônias", icon: "🔄",
+      designOps: "Críticas de design, Alinhamentos de sistema de design, Revisões de entrega",
+      productOps: "Revisões de ciclo, Acompanhamento de objetivos, Alinhamentos de portfólio",
+      convergence: "Cerimônias integradas onde decisões de design e produto acontecem juntas, eliminando entregas fragmentadas",
+      questions: [
+        "Rituais de design e produto são separados e desconectados",
+        "Existe alguma sobreposição, mas cada área mantém seus próprios rituais",
+        "Rituais compartilhados existem, com cadência definida e participação cruzada",
+        "Cerimônias são integradas intencionalmente, com governança unificada e ciclos de retorno claros",
+      ] },
+    { id: "tooling", label: "Ferramentas & Infraestrutura", icon: "🛠️",
+      designOps: "Editores visuais, Tokens de design, Bibliotecas de componentes, Documentação de design",
+      productOps: "Gestão de backlog, Visão de portfólio, Priorização, Análise de dados",
+      convergence: "Ecossistema integrado onde métricas de design (adoção, consistência) alimentam decisões de produto e vice-versa",
+      questions: [
+        "Ferramentas completamente isoladas, sem integração entre design e produto",
+        "Algumas integrações pontuais existem, mas não são sistêmicas",
+        "Ferramentas conectadas com fluxos automatizados e painéis compartilhados",
+        "Ecossistema unificado com fonte única de verdade para decisões entre disciplinas",
+      ] },
+    { id: "metrics", label: "Métricas & Resultados", icon: "📊",
+      designOps: "Adoção do sistema de design, Índice de consistência, Débito de experiência",
+      productOps: "Progresso de objetivos, Adoção de funcionalidades, Tempo até o mercado",
+      convergence: "Modelo de métricas compartilhado onde indicadores de experiência e produto se complementam para medir valor real",
+      questions: [
+        "Cada área tem métricas próprias que não conversam entre si",
+        "Algumas métricas são compartilhadas, mas sem modelo estruturado",
+        "Modelo de métricas integrado com indicadores antecedentes e consequentes conectados",
+        "Métricas de experiência e produto formam um sistema coeso orientado a resultados de negócio",
+      ] },
+    { id: "governance", label: "Governança & Decisão", icon: "⚖️",
+      designOps: "Revisões de design, Governança de marca, Responsabilidade sobre componentes",
+      productOps: "Priorização de roteiro, Planejamento de capacidade, Caminhos de escalação",
+      convergence: "Modelo de governança unificado onde as trocas entre qualidade de experiência e velocidade são explícitas e bem gerenciadas",
+      questions: [
+        "Decisões de design e produto acontecem isoladas, gerando conflitos frequentes",
+        "Existe comunicação entre as áreas, mas sem modelo formal de co-decisão",
+        "Governança compartilhada com papéis claros e critérios de decisão definidos",
+        "Modelo de decisão integrado com trocas explícitas e responsabilidade compartilhada",
+      ] },
+    { id: "enablement", label: "Capacitação & Conhecimento", icon: "🧠",
+      designOps: "Integração de designers, Diretrizes, Guias práticos de design",
+      productOps: "Integração de gestores de produto, Modelos, Guias práticos de produto",
+      convergence: "Base de conhecimento unificada que capacita tanto gestores de produto quanto designers a operar de forma autônoma e alinhada",
+      questions: [
+        "Cada área tem seus próprios materiais sem padronização ou compartilhamento",
+        "Materiais parcialmente compartilhados, mas sem estratégia de capacitação integrada",
+        "Guias e diretrizes unificados com programa de capacitação entre áreas",
+        "Organização que aprende, onde conhecimento flui naturalmente entre design e produto",
+      ] },
+    { id: "community", label: "Comunidade & Cultura", icon: "🌱",
+      designOps: "Comunidade de prática de design, Mentoria, Palestras de design",
+      productOps: "Comunidade de gestores de produto, Guildas, Sessões de troca",
+      convergence: "Comunidade integrada onde designers e gestores de produto co-criam práticas e compartilham aprendizados continuamente",
+      questions: [
+        "Comunidades isoladas sem interação entre design e produto",
+        "Interações pontuais existem, mas não há comunidade entre áreas estruturada",
+        "Comunidade de prática conjunta com eventos regulares e responsabilidade compartilhada",
+        "Cultura de colaboração orgânica onde as fronteiras entre operações de design e produto são fluidas",
+      ] },
+  ],
+  en: [
+    { id: "rituals", label: "Rituals & Ceremonies", icon: "🔄",
+      designOps: "Design critiques, Design system syncs, Delivery reviews",
+      productOps: "Cycle reviews, Objective tracking, Portfolio syncs",
+      convergence: "Integrated ceremonies where design and product decisions happen together, eliminating fragmented handoffs",
+      questions: [
+        "Design and product rituals are separate and disconnected",
+        "There is some overlap, but each area keeps its own rituals",
+        "Shared rituals exist, with a defined cadence and cross-participation",
+        "Ceremonies are intentionally integrated, with unified governance and clear feedback loops",
+      ] },
+    { id: "tooling", label: "Tools & Infrastructure", icon: "🛠️",
+      designOps: "Visual editors, Design tokens, Component libraries, Design documentation",
+      productOps: "Backlog management, Portfolio view, Prioritization, Data analysis",
+      convergence: "An integrated ecosystem where design metrics (adoption, consistency) feed product decisions and vice versa",
+      questions: [
+        "Tools are completely siloed, with no integration between design and product",
+        "Some one-off integrations exist, but they are not systemic",
+        "Connected tools with automated flows and shared dashboards",
+        "A unified ecosystem with a single source of truth for cross-discipline decisions",
+      ] },
+    { id: "metrics", label: "Metrics & Outcomes", icon: "📊",
+      designOps: "Design system adoption, Consistency index, Experience debt",
+      productOps: "Objective progress, Feature adoption, Time to market",
+      convergence: "A shared metrics model where experience and product indicators complement each other to measure real value",
+      questions: [
+        "Each area has its own metrics that don't talk to each other",
+        "Some metrics are shared, but without a structured model",
+        "An integrated metrics model with connected leading and lagging indicators",
+        "Experience and product metrics form a cohesive system oriented to business outcomes",
+      ] },
+    { id: "governance", label: "Governance & Decision-Making", icon: "⚖️",
+      designOps: "Design reviews, Brand governance, Component ownership",
+      productOps: "Roadmap prioritization, Capacity planning, Escalation paths",
+      convergence: "A unified governance model where trade-offs between experience quality and speed are explicit and well managed",
+      questions: [
+        "Design and product decisions happen in isolation, causing frequent conflicts",
+        "The areas communicate, but without a formal co-decision model",
+        "Shared governance with clear roles and defined decision criteria",
+        "An integrated decision model with explicit trade-offs and shared accountability",
+      ] },
+    { id: "enablement", label: "Enablement & Knowledge", icon: "🧠",
+      designOps: "Designer onboarding, Guidelines, Design playbooks",
+      productOps: "Product manager onboarding, Templates, Product playbooks",
+      convergence: "A unified knowledge base that enables both product managers and designers to operate autonomously and in alignment",
+      questions: [
+        "Each area has its own materials, with no standardization or sharing",
+        "Materials are partly shared, but without an integrated enablement strategy",
+        "Unified guides and guidelines with a cross-area enablement program",
+        "A learning organization where knowledge flows naturally between design and product",
+      ] },
+    { id: "community", label: "Community & Culture", icon: "🌱",
+      designOps: "Design community of practice, Mentoring, Design talks",
+      productOps: "Product manager community, Guilds, Knowledge-sharing sessions",
+      convergence: "An integrated community where designers and product managers co-create practices and continuously share learnings",
+      questions: [
+        "Siloed communities with no interaction between design and product",
+        "One-off interactions exist, but there is no structured cross-area community",
+        "A joint community of practice with regular events and shared ownership",
+        "An organic culture of collaboration where the boundaries between design and product operations are fluid",
+      ] },
+  ],
+};
 
 // Escala de maturidade nas cores do portfólio: do rosa (fragmentado) ao lilás (fluido)
-const MATURITY_LABELS = [
-  { min: 1, max: 1.5, label: "Fragmentado", color: "#E07A9A", desc: "Operações de design e produto funcionam como mundos paralelos" },
-  { min: 1.5, max: 2.5, label: "Emergente", color: "#C48FC9", desc: "Pontes começam a surgir entre as disciplinas" },
-  { min: 2.5, max: 3.5, label: "Integrado", color: "#9B7FD4", desc: "Convergência ativa com práticas e governança compartilhadas" },
-  { min: 3.5, max: 4.1, label: "Fluido", color: "#D4C4F0", desc: "As fronteiras entre as operações são intencionalmente permeáveis" },
-];
-const getMaturityInfo = score => MATURITY_LABELS.find(m => score >= m.min && score < m.max) || MATURITY_LABELS[0];
+const MATURITY = {
+  pt: [
+    { min: 1, max: 1.5, label: "Fragmentado", color: "#E07A9A", desc: "Operações de design e produto funcionam como mundos paralelos" },
+    { min: 1.5, max: 2.5, label: "Emergente", color: "#C48FC9", desc: "Pontes começam a surgir entre as disciplinas" },
+    { min: 2.5, max: 3.5, label: "Integrado", color: "#9B7FD4", desc: "Convergência ativa com práticas e governança compartilhadas" },
+    { min: 3.5, max: 4.1, label: "Fluido", color: "#D4C4F0", desc: "As fronteiras entre as operações são intencionalmente permeáveis" },
+  ],
+  en: [
+    { min: 1, max: 1.5, label: "Fragmented", color: "#E07A9A", desc: "Design and product operations work as parallel worlds" },
+    { min: 1.5, max: 2.5, label: "Emerging", color: "#C48FC9", desc: "Bridges are starting to form between the disciplines" },
+    { min: 2.5, max: 3.5, label: "Integrated", color: "#9B7FD4", desc: "Active convergence with shared practices and governance" },
+    { min: 3.5, max: 4.1, label: "Fluid", color: "#D4C4F0", desc: "The boundaries between the operations are intentionally permeable" },
+  ],
+};
 
-const state = { answers: {}, tab: "assess", expanded: null, showResults: false };
-const main = document.getElementById("main");
-const tabs = document.getElementById("tabs");
+const UI = {
+  pt: {
+    docTitle: "DesignOps × Product Ops — Modelo de Convergência",
+    brand: "DesignOps <em>× Product Ops</em>",
+    home: "← Portal", homeNav: "Portal de criações", menu: "Abrir menu", nav: "Seções",
+    navOverview: "Visão geral", navAssess: "Diagnóstico", navModel: "Modelo", navResult: "Resultado", navDims: "Dimensões",
+    eyebrow: "DesignOps · Modelo interativo",
+    title: "DesignOps × <em>Product Ops</em>",
+    lede: "Avalie o nível de convergência entre as duas disciplinas na sua organização, em 6 dimensões.",
+    assessIntro: "Selecione a afirmação que melhor descreve a realidade da sua organização em cada dimensão.",
+    level: n => `Nível ${n}`,
+    answered: "dimensões respondidas", seeResult: "Ver meu diagnóstico →",
+    modelEyebrow: "O modelo", modelTitle: "Como as disciplinas <em>convergem</em>",
+    modelLede: "A convergência entre operações de design e operações de produto acontece em 6 dimensões. Veja como cada disciplina contribui e onde elas se encontram.",
+    designOps: "Operações de Design", productOps: "Operações de Produto", convergence: "✦ Convergência",
+    resultEyebrow: "Resultado", resultTitle: "Seu <em>diagnóstico</em>",
+    resultLede: "O nível médio de convergência e como cada dimensão contribui para ele.",
+    of: "de 4.0", byDim: "Resultado por dimensão", nextSteps: "Próximos passos sugeridos",
+    goodShape: "Sua organização já demonstra boa convergência! Foque em escalar as práticas que funcionam e documentar o que aprendeu para a comunidade.",
+    insufficient: "Diagnóstico incompleto",
+    insufficientDesc: n => `Responda as ${n} dimensões restantes para ver o resultado.`,
+    goAssess: "Ir ao diagnóstico", reset: "Refazer diagnóstico",
+    prev: "← Anterior", next: "Próximo →",
+    foot: "<em>DesignOps × Product Ops</em> · modelo de convergência · por Thayná Bordin",
+  },
+  en: {
+    docTitle: "DesignOps × Product Ops — Convergence Model",
+    brand: "DesignOps <em>× Product Ops</em>",
+    home: "← Portal", homeNav: "Creations portal", menu: "Open menu", nav: "Sections",
+    navOverview: "Overview", navAssess: "Assessment", navModel: "Model", navResult: "Result", navDims: "Dimensions",
+    eyebrow: "DesignOps · Interactive model",
+    title: "DesignOps × <em>Product Ops</em>",
+    lede: "Assess how far the two disciplines have converged in your organization, across 6 dimensions.",
+    assessIntro: "Pick the statement that best describes your organization's reality in each dimension.",
+    level: n => `Level ${n}`,
+    answered: "dimensions answered", seeResult: "See my assessment →",
+    modelEyebrow: "The model", modelTitle: "How the disciplines <em>converge</em>",
+    modelLede: "Convergence between design operations and product operations happens across 6 dimensions. See what each discipline brings and where they meet.",
+    designOps: "Design Operations", productOps: "Product Operations", convergence: "✦ Convergence",
+    resultEyebrow: "Result", resultTitle: "Your <em>assessment</em>",
+    resultLede: "The average convergence level and how each dimension contributes to it.",
+    of: "out of 4.0", byDim: "Result by dimension", nextSteps: "Suggested next steps",
+    goodShape: "Your organization already shows strong convergence! Focus on scaling the practices that work and documenting what you've learned for the community.",
+    insufficient: "Incomplete assessment",
+    insufficientDesc: n => `Answer the ${n} remaining dimensions to see the result.`,
+    goAssess: "Go to assessment", reset: "Restart assessment",
+    prev: "← Previous", next: "Next →",
+    foot: "<em>DesignOps × Product Ops</em> · convergence model · by Thayná Bordin",
+  },
+};
 
-function frameworkView() {
-  return `
-    <p class="intro">A convergência entre operações de design e operações de produto acontece em 6 dimensões. Toque em cada uma para explorar como as disciplinas se complementam.</p>
-    ${DIMENSIONS.map(d => {
-      const open = state.expanded === d.id;
-      return `
-        <button class="dim ${open ? "open" : ""}" data-expand="${d.id}" aria-expanded="${open}">
-          <div class="dim-head"><span class="dim-icon">${d.icon}</span><span class="dim-label">${d.label}</span><span class="chev">▾</span></div>
-          ${open ? `
-            <div class="dim-body">
-              <div class="pair">
-                <div class="box design"><div class="box-t">Operações de Design</div><div class="box-d">${d.designOps}</div></div>
-                <div class="box product"><div class="box-t">Operações de Produto</div><div class="box-d">${d.productOps}</div></div>
-              </div>
-              <div class="box conv"><div class="box-t">✦ Convergência</div><div class="box-d">${d.convergence}</div></div>
-            </div>` : ""}
-        </button>`;
-    }).join("")}`;
+// Idioma: ?lang= no endereço, depois a última escolha salva no portal, depois o idioma do navegador
+function pickLang() {
+  const q = new URLSearchParams(location.search).get("lang");
+  if (q === "pt" || q === "en") return q;
+  try { const s = localStorage.getItem("portal-lang"); if (s === "pt" || s === "en") return s; } catch (e) {}
+  return (navigator.language || "pt").toLowerCase().startsWith("pt") ? "pt" : "en";
 }
 
-function assessView() {
+const VIEWS = ["assess", "model", "result"];
+const state = { lang: pickLang(), view: "assess", answers: {} };
+const $ = id => document.getElementById(id);
+const maturity = score => MATURITY[state.lang].find(m => score >= m.min && score < m.max) || MATURITY[state.lang][0];
+
+function sidebarView(t, dims) {
   const answered = Object.keys(state.answers).length;
+  const item = (go, num, label, extra = "", anchor = "") =>
+    `<button class="nav-item${state.view === go && !anchor ? " active" : ""}" data-go="${go}"${anchor ? ` data-anchor="${anchor}"` : ""}><span class="nav-num">${num}</span>${label}${extra}</button>`;
   return `
-    <p class="intro">Selecione a afirmação que melhor descreve a realidade da sua organização em cada dimensão.</p>
-    ${DIMENSIONS.map((d, i) => {
-      const a = state.answers[d.id];
-      const badge = a ? (() => { const c = getMaturityInfo(a).color; return `<span class="lvl-badge" style="background:${c}22;color:${c}">Nível ${a}</span>`; })() : "";
-      return `
-        <div class="q-block">
-          <div class="q-head"><span class="ic">${d.icon}</span><span class="q-title">${i + 1}. ${d.label}</span>${badge}</div>
-          <div class="opts">
-            ${d.questions.map(q => {
-              const sel = a === q.level;
-              const c = getMaturityInfo(q.level).color;
-              return `
-                <button class="opt ${sel ? "sel" : ""}" data-dim="${d.id}" data-level="${q.level}" style="${sel ? `background:${c}18;border-color:${c}66` : ""}">
-                  <span class="dot" style="${sel ? `border-color:${c};background:${c}` : ""}">${q.level}</span>
-                  <span>${q.text}</span>
-                </button>`;
-            }).join("")}
-          </div>
-        </div>`;
-    }).join("")}
-    ${answered === DIMENSIONS.length
-      ? `<button class="cta" data-results>Ver meu diagnóstico →</button>`
-      : `<div class="progress">${answered}/${DIMENSIONS.length} dimensões respondidas</div>`}`;
+    <div class="nav-home"><a class="nav-item" href="./?lang=${state.lang}"><span class="nav-num">←</span>${t.homeNav}</a></div>
+    <div class="nav-group">
+      <div class="nav-label">${t.navOverview}</div>
+      ${item("assess", "01", t.navAssess)}
+      ${item("model", "02", t.navModel)}
+      ${item("result", "03", t.navResult, `<span class="nav-status" style="color:var(--muted)">${answered}/${dims.length}</span>`)}
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">${t.navDims}</div>
+      ${dims.map((d, i) => {
+        const a = state.answers[d.id];
+        return item("assess", String(i + 1).padStart(2, "0"), d.label,
+          a ? `<span class="nav-status" style="color:${maturity(a).color}">${a}</span>` : "", d.id);
+      }).join("")}
+    </div>`;
 }
 
-function resultsView() {
-  const avg = DIMENSIONS.reduce((s, d) => s + state.answers[d.id], 0) / DIMENSIONS.length;
-  const m = getMaturityInfo(avg);
-  const weak = DIMENSIONS.filter(d => state.answers[d.id] <= 2);
-  return `
-    <div class="hero-score">
-      <div class="score-dot" style="background:${m.color};box-shadow:0 0 18px ${m.color}66"></div>
-      <div class="score" style="color:${m.color}">${avg.toFixed(1)}</div>
-      <div class="score-of">de 4.0</div>
-      <div class="score-label">${m.label}</div>
-      <div class="score-desc">${m.desc}</div>
-    </div>
-    <h3>Resultado por dimensão</h3>
-    ${DIMENSIONS.map(d => {
-      const s = state.answers[d.id];
-      const c = getMaturityInfo(s).color;
+function assessView(t, dims) {
+  const answered = Object.keys(state.answers).length;
+  const blocks = dims.map((d, i) => {
+    const a = state.answers[d.id];
+    const badge = a ? `<span class="lvl-badge" style="color:${maturity(a).color}">${t.level(a)}</span>` : "";
+    const options = d.questions.map((q, qi) => {
+      const level = qi + 1, sel = a === level, c = maturity(level).color;
       return `
-        <div class="res-row">
-          <span class="ic">${d.icon}</span><span class="res-label">${d.label}</span>
-          <div class="track"><div class="fill" style="width:${(s / 4) * 100}%;background:${c}"></div></div>
-          <span class="res-n" style="color:${c}">${s}</span>
-        </div>`;
-    }).join("")}
-    <div class="next">
-      <h3>Próximos passos sugeridos</h3>
+        <button class="opt${sel ? " sel" : ""}" data-dim="${d.id}" data-level="${level}" aria-pressed="${sel}" style="${sel ? `border-color:${c}` : ""}">
+          <span class="lvl" style="${sel ? `border-color:${c};background:${c};color:#111118` : ""}">${level}</span>
+          <span>${q}</span>
+        </button>`;
+    }).join("");
+    return `
+      <div class="block" id="dim-${d.id}">
+        <div class="block-head dim-head"><h2><span class="icon">${d.icon}</span>${String(i + 1).padStart(2, "0")} · ${d.label}</h2>${badge}</div>
+        <div class="grid g2">${options}</div>
+      </div>`;
+  }).join("");
+  return `
+    <div class="eyebrow">${t.eyebrow}</div>
+    <h1 class="title display">${t.title}</h1>
+    <p class="lede">${t.lede} ${t.assessIntro}</p>
+    ${blocks}
+    <div class="block">
+      <div class="progress">
+        <span class="progress-label">${answered}/${dims.length} ${t.answered}</span>
+        <div class="progress-track"><div class="progress-fill" style="width:${(answered / dims.length) * 100}%"></div></div>
+        ${answered === dims.length ? `<button class="btn primary" data-go="result">${t.seeResult}</button>` : ""}
+      </div>
+    </div>
+    <div class="pager"><button class="next" data-go="model"><small>${t.next}</small><span>${t.navModel}</span></button></div>`;
+}
+
+function modelView(t, dims) {
+  const blocks = dims.map((d, i) => `
+    <div class="block">
+      <div class="block-head dim-head"><h2><span class="icon">${d.icon}</span>${String(i + 1).padStart(2, "0")} · ${d.label}</h2></div>
+      <div class="grid g3">
+        <div class="card"><div class="kicker k-design">${t.designOps}</div><p>${d.designOps}</p></div>
+        <div class="card"><div class="kicker k-product">${t.productOps}</div><p>${d.productOps}</p></div>
+        <div class="card conv"><div class="kicker">${t.convergence}</div><p>${d.convergence}</p></div>
+      </div>
+    </div>`).join("");
+  return `
+    <div class="eyebrow">${t.modelEyebrow}</div>
+    <h1 class="title">${t.modelTitle}</h1>
+    <p class="lede">${t.modelLede}</p>
+    ${blocks}
+    <div class="pager">
+      <button class="prev" data-go="assess"><small>${t.prev}</small><span>${t.navAssess}</span></button>
+      <button class="next" data-go="result"><small>${t.next}</small><span>${t.navResult}</span></button>
+    </div>`;
+}
+
+function resultView(t, dims) {
+  const answered = Object.keys(state.answers).length;
+  const head = `
+    <div class="eyebrow">${t.resultEyebrow}</div>
+    <h1 class="title">${t.resultTitle}</h1>
+    <p class="lede">${t.resultLede}</p>`;
+  if (answered < dims.length) {
+    return head + `
+      <div class="card empty">
+        <div class="kicker">${t.insufficient}</div>
+        <p>${t.insufficientDesc(dims.length - answered)}</p>
+        <button class="btn" data-go="assess">${t.goAssess}</button>
+      </div>`;
+  }
+  const avg = dims.reduce((s, d) => s + state.answers[d.id], 0) / dims.length;
+  const m = maturity(avg);
+  const weak = dims.filter(d => state.answers[d.id] <= 2);
+  const rows = dims.map(d => {
+    const s = state.answers[d.id], c = maturity(s).color;
+    return `
+      <div class="res-row">
+        <span class="icon">${d.icon}</span>
+        <span class="label">${d.label}</span>
+        <div class="track"><div class="fill" style="width:${(s / 4) * 100}%;background:${c}"></div></div>
+        <span class="res-n" style="color:${c}">${s}</span>
+      </div>`;
+  }).join("");
+  return head + `
+    <div class="block">
+      <div class="card score-card" style="border-top:1px solid ${m.color}">
+        <div>
+          <div class="score-num" style="color:${m.color}">${avg.toFixed(1)}</div>
+          <div class="score-of">${t.of}</div>
+        </div>
+        <div><h4>${m.label}</h4><p>${m.desc}</p></div>
+      </div>
+    </div>
+    <div class="block">
+      <div class="block-head"><h2>${t.byDim}</h2></div>
+      <div class="card">${rows}</div>
+    </div>
+    <div class="block">
+      <div class="block-head"><h2>${t.nextSteps}</h2></div>
       ${weak.length
-        ? weak.slice(0, 3).map(d => `<div class="step"><strong>${d.icon} ${d.label}:</strong> ${d.convergence}</div>`).join("")
-        : `<div class="good">Sua organização já demonstra boa convergência! Foque em escalar as práticas que funcionam e documentar o que aprendeu para a comunidade.</div>`}
+        ? `<div class="grid g3">${weak.slice(0, 3).map(d => `
+            <div class="card side"><div class="kicker">${d.icon} ${d.label}</div><p>${d.convergence}</p></div>`).join("")}</div>`
+        : `<p class="quote">${t.goodShape}</p>`}
     </div>
-    <button class="reset" data-reset>Refazer diagnóstico</button>`;
+    <div class="actions"><button class="btn ghost" data-reset>${t.reset}</button></div>`;
 }
 
+let lastView = null;
 function render() {
-  tabs.querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.tab === state.tab));
-  if (state.tab === "framework") main.innerHTML = frameworkView();
-  else main.innerHTML = state.showResults ? resultsView() : assessView();
+  const t = UI[state.lang];
+  const dims = DIMENSIONS[state.lang];
+  document.documentElement.lang = state.lang === "pt" ? "pt-BR" : "en";
+  document.title = t.docTitle;
+  $("brand").innerHTML = t.brand;
+  $("homeLink").textContent = t.home;
+  $("homeLink").href = "./?lang=" + state.lang;
+  $("footNote").innerHTML = t.foot;
+  $("menuBtn").setAttribute("aria-label", t.menu);
+  $("sidebar").setAttribute("aria-label", t.nav);
+  document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === state.lang)));
+  $("sidebar").innerHTML = sidebarView(t, dims);
+  const body = state.view === "model" ? modelView(t, dims) : state.view === "result" ? resultView(t, dims) : assessView(t, dims);
+  // A animação de entrada só roda ao trocar de seção, não a cada resposta
+  const animate = state.view !== lastView;
+  lastView = state.view;
+  $("content").innerHTML = `<div class="${animate ? "view" : ""}">${body}</div>`;
 }
 
-tabs.addEventListener("click", e => {
-  const b = e.target.closest("button[data-tab]");
-  if (b) { state.tab = b.dataset.tab; render(); }
-});
+function go(view, anchor) {
+  const sameView = view === state.view;
+  state.view = VIEWS.includes(view) ? view : "assess";
+  document.body.classList.remove("nav-open");
+  if (!sameView) render();
+  const target = anchor && document.getElementById("dim-" + anchor);
+  if (target) window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 100, behavior: "smooth" });
+  else window.scrollTo({ top: 0, behavior: "auto" });
+}
 
-main.addEventListener("click", e => {
-  const b = e.target.closest("button");
-  if (!b) return;
-  if (b.dataset.expand) state.expanded = state.expanded === b.dataset.expand ? null : b.dataset.expand;
-  else if (b.dataset.dim) state.answers = { ...state.answers, [b.dataset.dim]: Number(b.dataset.level) };
-  else if ("results" in b.dataset) { state.showResults = true; scrollTo(0, 0); }
-  else if ("reset" in b.dataset) { state.answers = {}; state.showResults = false; state.expanded = null; scrollTo(0, 0); }
-  else return;
+function setLang(next) {
+  if (next === state.lang) return;
+  state.lang = next;
+  try { localStorage.setItem("portal-lang", next); } catch (e) {}
+  const url = new URL(location.href);
+  url.searchParams.set("lang", next);
+  history.replaceState(null, "", url);
   render();
+}
+
+document.addEventListener("click", e => {
+  const l = e.target.closest(".lang button");
+  if (l) { setLang(l.dataset.lang); return; }
+  const g = e.target.closest("[data-go]");
+  if (g) { go(g.dataset.go, g.dataset.anchor); return; }
+  const o = e.target.closest("[data-dim]");
+  if (o) {
+    state.answers = { ...state.answers, [o.dataset.dim]: Number(o.dataset.level) };
+    const y = window.scrollY;
+    render();
+    window.scrollTo(0, y);
+    return;
+  }
+  if (e.target.closest("[data-reset]")) { state.answers = {}; render(); go("assess"); }
 });
+$("brand").addEventListener("click", () => go("assess"));
+$("menuBtn").addEventListener("click", () => document.body.classList.toggle("nav-open"));
+$("overlay").addEventListener("click", () => document.body.classList.remove("nav-open"));
 
 render();
 </script>

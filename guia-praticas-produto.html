@@ -2308,6 +2308,8 @@
     document.documentElement.lang = t.html;
     $('brand').innerHTML = t.brand;
     $('homeLink').textContent = t.home;
+    $('homeLink').href = './?lang=' + lang;
+    sidebar.querySelectorAll('.nav-home a').forEach(a => { a.href = './?lang=' + lang; });
     $('footNote').innerHTML = t.foot;
     input.placeholder = t.search; input.setAttribute('aria-label', t.search);
     $('menuBtn').setAttribute('aria-label', t.menu);
