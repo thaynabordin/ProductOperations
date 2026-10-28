@@ -239,7 +239,8 @@ const UI = {
   },
 };
 
-const state = { lang: "pt", activeArea: null, health: {}, notes: {}, view: "canvas" };
+const urlLang = new URLSearchParams(location.search).get("lang");
+const state = { lang: urlLang === "en" ? "en" : "pt", activeArea: null, health: {}, notes: {}, view: "canvas" };
 const root = document.getElementById("root");
 
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -367,7 +368,7 @@ function render() {
   else body = area ? detailView(t, area) : canvasView(t, areas);
 
   root.innerHTML = `
-    <a class="home-link" href="./">${t.home}</a>
+    <a class="home-link" href="./?lang=${state.lang}">${t.home}</a>
     <header class="head">
       <div class="wrap" style="position:relative">
         <div class="corner l"></div><div class="corner r"></div>
@@ -383,7 +384,7 @@ function render() {
       <button data-view="overview" class="${state.view === "overview" ? "on" : ""}">${t.tabReading}${assessed === areas.length ? "" : ` [${assessed}/6]`}</button>
     </nav>
     <main>${body}</main>
-    <footer><a href="./">${t.footer}</a></footer>`;
+    <footer><a href="./?lang=${state.lang}">${t.footer}</a></footer>`;
 }
 
 root.addEventListener("click", e => {
